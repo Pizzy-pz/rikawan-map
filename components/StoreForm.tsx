@@ -102,6 +102,7 @@ export default function StoreForm({ initialData, onSubmit, submitLabel, loading 
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="例：酒場あおば"
+          maxLength={100}
           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -163,6 +164,7 @@ export default function StoreForm({ initialData, onSubmit, submitLabel, loading 
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           placeholder="例：京都府京都市下京区四条通小橋西入ル真町455"
+          maxLength={200}
           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -176,6 +178,7 @@ export default function StoreForm({ initialData, onSubmit, submitLabel, loading 
           onChange={(e) => setMemo(e.target.value)}
           placeholder="場所情報、担当者名など"
           rows={3}
+          maxLength={500}
           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
         />
       </div>
