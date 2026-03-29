@@ -73,7 +73,7 @@ export default function StoreMap({ latitude, longitude, storeName, address }: Pr
     );
   };
 
-  // 地図初期化 → 即ルート表示
+  // 地図初期化のみ（ルート取得はボタン押下時）
   useEffect(() => {
     if (!apiKey || !mapRef.current) return;
 
@@ -96,7 +96,6 @@ export default function StoreMap({ latitude, longitude, storeName, address }: Pr
         });
         mapInstanceRef.current = map;
         setMapReady(true);
-        showRoute(map);
       })
       .catch(() => setInitError("地図の読み込みに失敗しました"));
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -139,11 +138,9 @@ export default function StoreMap({ latitude, longitude, storeName, address }: Pr
           ref={mapRef}
           className="w-full h-96 rounded-xl border border-gray-200 bg-gray-100"
         />
-        {(!mapReady || routeLoading) && !initError && (
+        {!mapReady && !initError && (
           <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-gray-100/80">
-            <span className="text-gray-500 text-sm">
-              {!mapReady ? "地図を読み込み中..." : "ルートを取得中..."}
-            </span>
+            <span className="text-gray-500 text-sm">地図を読み込み中...</span>
           </div>
         )}
         {initError && (
@@ -159,6 +156,17 @@ export default function StoreMap({ latitude, longitude, storeName, address }: Pr
         </div>
       )}
 
+      <button
+        type="button"
+        onClick={() => showRoute(mapInstanceRef.current)}
+        disabled={routeLoading || !mapReady}
+        className="w-full bg-blue-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition flex items-center justify-center gap-2"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+        </svg>
+        {routeLoading ? "ルートを取得中..." : "現在地からのルートを表示"}
+      </button>
       <a
         href={googleMapsNavUrl}
         target="_blank"
