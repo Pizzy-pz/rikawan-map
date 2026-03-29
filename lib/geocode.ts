@@ -10,7 +10,7 @@ export async function geocodeAddress(
 
   return new Promise((resolve) => {
     const geocoder = new window.google.maps.Geocoder();
-    geocoder.geocode({ address }, (results, status) => {
+    geocoder.geocode({ address }, (results: google.maps.GeocoderResult[] | null, status: google.maps.GeocoderStatus) => {
       if (status === "OK" && results && results[0]) {
         const loc = results[0].geometry.location;
         resolve({ latitude: loc.lat(), longitude: loc.lng() });
