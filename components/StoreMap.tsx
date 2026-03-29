@@ -39,8 +39,6 @@ export default function StoreMap({ latitude, longitude, storeName, address }: Pr
 
         const directionsService = new window.google.maps.DirectionsService();
         const directionsRenderer = new window.google.maps.DirectionsRenderer();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        directionsRenderer.setMap(map as any);
 
         directionsService.route(
           {
@@ -52,6 +50,8 @@ export default function StoreMap({ latitude, longitude, storeName, address }: Pr
           (result: any, status: any) => {
             setRouteLoading(false);
             if (status === "OK" && result) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              directionsRenderer.setMap(map as any);
               directionsRenderer.setDirections(result);
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               (map as any).fitBounds(result.routes[0].bounds);
