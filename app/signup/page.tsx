@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signUp } from "@/lib/auth";
-import { useAuth } from "@/lib/authContext";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -13,7 +12,6 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { refresh } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +27,7 @@ export default function SignupPage() {
     }
 
     setLoading(true);
-    const { user, error: authError } = signUp(email, password);
+    const { user, error: authError } = await signUp(email, password);
     setLoading(false);
 
     if (authError || !user) {
@@ -37,7 +35,6 @@ export default function SignupPage() {
       return;
     }
 
-    refresh();
     router.push("/stores");
   };
 

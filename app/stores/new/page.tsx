@@ -30,11 +30,13 @@ export default function NewStorePage() {
 
   if (!user) return null;
 
-  const handleSubmit = (data: StoreFormData & { latitude: number; longitude: number }) => {
+  const handleSubmit = async (data: StoreFormData & { latitude: number; longitude: number }) => {
     setSaving(true);
-    const store = createStore(user.id, data);
+    const store = await createStore(user.id, data);
     setSaving(false);
-    router.push(`/stores/${store.id}`);
+    if (store) {
+      router.push(`/stores/${store.id}`);
+    }
   };
 
   return (

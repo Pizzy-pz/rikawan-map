@@ -1,70 +1,75 @@
-// Demo store management using localStorage (replace with Supabase in production)
+import { supabase } from "./supabase";
 import { Store, StoreFormData } from "@/types/store";
 
-const STORES_KEY = "demo_stores";
-
-function getAllStores(): Store[] {
-  if (typeof window === "undefined") return [];
-  const data = localStorage.getItem(STORES_KEY);
-  return data ? JSON.parse(data) : [];
+export async function getStores(userId: string): Promise<Store[]> {
+  const { data, error } = await supabase
+    .from("stores")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+  if (error) return [];
+  return data as Store[];
 }
 
-function saveAllStores(stores: Store[]) {
-  localStorage.setItem(STORES_KEY, JSON.stringify(stores));
+export async function getStore(id: string, userId: string): Promise<Store | null> {
+  const { data, error } = await supabase
+    .from("stores")
+    .select("*")
+    .eq("id", id)
+    .eq("user_id", userId)
+    .single();
+  if (error) return null;
+  return data as Store;
 }
 
-export function getStores(userId: string): Store[] {
-  return getAllStores().filter((s) => s.user_id === userId);
+export async function createStore(
+  userId: string,
+  data: StoreFormData & { latitude: number; longitude: number }
+): Promise<Store | null> {
+  const { data: store, error } = await supabase
+    .from("stores")
+    .insert({
+      user_id: userId,
+      name: data.name,
+      address: data.address,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      memo: data.memo ?? null,
+    })
+    .select()
+    .single();
+  if (error) return null;
+  return store as Store;
 }
 
-export function getStore(id: string, userId: string): Store | null {
-  return getAllStores().find((s) => s.id === id && s.user_id === userId) ?? null;
-}
-
-export function createStore(userId: string, data: StoreFormData & { latitude: number; longitude: number }): Store {
-  const now = new Date().toISOString();
-  const store: Store = {
-    id: crypto.randomUUID(),
-    user_id: userId,
-    name: data.name,
-    address: data.address,
-    latitude: data.latitude,
-    longitude: data.longitude,
-    memo: data.memo,
-    created_at: now,
-    updated_at: now,
-  };
-  const stores = getAllStores();
-  saveAllStores([...stores, store]);
-  return store;
-}
-
-export function updateStore(
+export async function updateStore(
   id: string,
   userId: string,
   data: StoreFormData & { latitude: number; longitude: number }
-): Store | null {
-  const stores = getAllStores();
-  const index = stores.findIndex((s) => s.id === id && s.user_id === userId);
-  if (index === -1) return null;
-  const updated: Store = {
-    ...stores[index],
-    name: data.name,
-    address: data.address,
-    latitude: data.latitude,
-    longitude: data.longitude,
-    memo: data.memo,
-    updated_at: new Date().toISOString(),
-  };
-  stores[index] = updated;
-  saveAllStores(stores);
-  return updated;
+): Promise<Store | null> {
+  const { data: store, error } = await supabase
+    .from("stores")
+    .update({
+      name: data.name,
+      address: data.address,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      memo: data.memo ?? null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .eq("user_id", userId)
+    .select()
+    .single();
+  if (error) return null;
+  return store as Store;
 }
 
-export function deleteStore(id: string, userId: string): boolean {
-  const stores = getAllStores();
-  const filtered = stores.filter((s) => !(s.id === id && s.user_id === userId));
-  if (filtered.length === stores.length) return false;
-  saveAllStores(filtered);
-  return true;
+export async function deleteStore(id: string, userId: string): Promise<boolean> {
+  const { error } = await supabase
+    .from("stores")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", userId);
+  return !error;
 }

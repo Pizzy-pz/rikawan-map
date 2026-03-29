@@ -137,7 +137,7 @@ export default function StoreMap({ latitude, longitude, storeName, address }: Pr
       <div className="relative">
         <div
           ref={mapRef}
-          className="w-full h-64 rounded-xl border border-gray-200 bg-gray-100"
+          className="w-full h-96 rounded-xl border border-gray-200 bg-gray-100"
         />
         {(!mapReady || routeLoading) && !initError && (
           <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-gray-100/80">

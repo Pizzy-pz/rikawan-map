@@ -30,11 +30,10 @@ export default function StoresPage() {
 
   useEffect(() => {
     if (user) {
-      setStores(getStores(user.id));
+      getStores(user.id).then(setStores);
     }
   }, [user]);
 
-  // スクロール位置を復元
   useEffect(() => {
     if (!stores.length || !listRef.current) return;
     const saved = sessionStorage.getItem(SCROLL_KEY);
@@ -73,7 +72,6 @@ export default function StoresPage() {
     <div className="h-screen flex flex-col">
       <Header />
 
-      {/* 固定ヘッダーエリア */}
       <div className="bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-2xl w-full mx-auto px-4 pt-4 pb-3">
           <div className="flex items-center justify-between mb-3">
@@ -89,7 +87,6 @@ export default function StoresPage() {
         </div>
       </div>
 
-      {/* スクロールエリア */}
       <div
         ref={listRef}
         className="flex-1 overflow-y-auto"

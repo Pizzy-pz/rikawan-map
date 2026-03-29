@@ -25,12 +25,13 @@ export default function StoreDetailPage() {
 
   useEffect(() => {
     if (user && id) {
-      const found = getStore(id, user.id);
-      if (found) {
-        setStore(found);
-      } else {
-        setNotFound(true);
-      }
+      getStore(id, user.id).then((found) => {
+        if (found) {
+          setStore(found);
+        } else {
+          setNotFound(true);
+        }
+      });
     }
   }, [user, id]);
 
@@ -60,9 +61,9 @@ export default function StoreDetailPage() {
 
   if (!store) return null;
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!confirm(`「${store.name}」を削除しますか？\nこの操作は取り消せません。`)) return;
-    deleteStore(id, user.id);
+    await deleteStore(id, user.id);
     router.push("/stores");
   };
 

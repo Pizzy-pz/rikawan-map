@@ -26,12 +26,13 @@ export default function EditStorePage() {
 
   useEffect(() => {
     if (user && id) {
-      const found = getStore(id, user.id);
-      if (found) {
-        setStore(found);
-      } else {
-        setNotFound(true);
-      }
+      getStore(id, user.id).then((found) => {
+        if (found) {
+          setStore(found);
+        } else {
+          setNotFound(true);
+        }
+      });
     }
   }, [user, id]);
 
@@ -61,9 +62,9 @@ export default function EditStorePage() {
 
   if (!store) return null;
 
-  const handleSubmit = (data: StoreFormData & { latitude: number; longitude: number }) => {
+  const handleSubmit = async (data: StoreFormData & { latitude: number; longitude: number }) => {
     setSaving(true);
-    updateStore(id, user.id, data);
+    await updateStore(id, user.id, data);
     setSaving(false);
     router.push(`/stores/${id}`);
   };

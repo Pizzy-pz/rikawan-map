@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "@/lib/auth";
-import { useAuth } from "@/lib/authContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -12,14 +11,13 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { refresh } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
-    const { user, error: authError } = signIn(email, password);
+    const { user, error: authError } = await signIn(email, password);
     setLoading(false);
 
     if (authError || !user) {
@@ -27,7 +25,6 @@ export default function LoginPage() {
       return;
     }
 
-    refresh();
     router.push("/stores");
   };
 
