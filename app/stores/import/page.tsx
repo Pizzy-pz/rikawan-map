@@ -8,6 +8,7 @@ import { getShareLinkOwner } from "@/lib/shareLinks";
 import { getStores, createStore } from "@/lib/stores";
 import { Store } from "@/types/store";
 import Header from "@/components/Header";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 function ImportContent() {
   const { user, loading } = useAuth();
@@ -21,6 +22,8 @@ function ImportContent() {
   const [copied, setCopied] = useState<Set<string>>(new Set());
   const [copyingOne, setCopyingOne] = useState<string | null>(null);
   const [copyingAll, setCopyingAll] = useState(false);
+  const [copyProgress, setCopyProgress] = useState(0);
+  const [copyTotal, setCopyTotal] = useState(0);
   const [allCopied, setAllCopied] = useState(false);
 
   useEffect(() => {
@@ -76,21 +79,25 @@ function ImportContent() {
 
   const handleCopyAll = async () => {
     if (!user || copyingAll) return;
+    const targets = stores.filter((s) => !copied.has(s.id));
     setCopyingAll(true);
-    for (const store of stores) {
-      if (!copied.has(store.id)) {
-        await createStore(user.id, {
-          name: store.name,
-          address: store.address,
-          latitude: store.latitude,
-          longitude: store.longitude,
-          memo: store.memo ?? undefined,
-        });
-      }
+    setCopyProgress(0);
+    setCopyTotal(targets.length);
+    for (let i = 0; i < targets.length; i++) {
+      await createStore(user.id, {
+        name: targets[i].name,
+        address: targets[i].address,
+        latitude: targets[i].latitude,
+        longitude: targets[i].longitude,
+        memo: targets[i].memo ?? undefined,
+      });
+      setCopyProgress(i + 1);
     }
     setCopied(new Set(stores.map((s) => s.id)));
     setAllCopied(true);
     setCopyingAll(false);
+    setCopyProgress(0);
+    setCopyTotal(0);
   };
 
   if (loading || fetching) {
@@ -121,6 +128,13 @@ function ImportContent() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {(copyingAll || copyingOne) && (
+        <LoadingOverlay
+          message={copyingAll ? "リストを追加しています..." : "追加しています..."}
+          current={copyingAll ? copyProgress : undefined}
+          total={copyingAll ? copyTotal : undefined}
+        />
+      )}
       <Header />
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 py-6">
         <div className="flex items-center gap-2 mb-6">

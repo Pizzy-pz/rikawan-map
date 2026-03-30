@@ -10,6 +10,7 @@ import { Store } from "@/types/store";
 import Header from "@/components/Header";
 import StoreList from "@/components/StoreList";
 import StoreSearch from "@/components/StoreSearch";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 const SCROLL_KEY = "stores_scroll";
 const QUERY_KEY = "stores_query";
@@ -40,6 +41,7 @@ export default function StoresPage() {
   const [selecting, setSelecting] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState(false);
+  const [deleteProgress, setDeleteProgress] = useState(0);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -133,13 +135,17 @@ export default function StoresPage() {
     if (!user || selectedIds.size === 0) return;
     if (!confirm(`選択した${selectedIds.size}件の店舗を削除しますか？\nこの操作は取り消せません。`)) return;
     setDeleting(true);
-    for (const id of selectedIds) {
-      await deleteStore(id, user.id);
+    setDeleteProgress(0);
+    const ids = Array.from(selectedIds);
+    for (let i = 0; i < ids.length; i++) {
+      await deleteStore(ids[i], user.id);
+      setDeleteProgress(i + 1);
     }
     setStores((prev) => prev.filter((s) => !selectedIds.has(s.id)));
     setSelectedIds(new Set());
     setSelecting(false);
     setDeleting(false);
+    setDeleteProgress(0);
   };
 
   if (loading) {
@@ -162,6 +168,13 @@ export default function StoresPage() {
 
   return (
     <div className="h-screen flex flex-col">
+      {deleting && (
+        <LoadingOverlay
+          message="削除しています..."
+          current={deleteProgress}
+          total={selectedIds.size}
+        />
+      )}
       <Header />
 
       <div className="bg-white border-b border-gray-100 shadow-sm">
