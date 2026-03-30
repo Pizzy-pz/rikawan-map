@@ -31,6 +31,7 @@ export default function StoresPage() {
   const [showImport, setShowImport] = useState(false);
   const [importUrl, setImportUrl] = useState("");
   const [importError, setImportError] = useState<string | null>(null);
+  const [sortByKana, setSortByKana] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -109,9 +110,11 @@ export default function StoresPage() {
 
   if (!user) return null;
 
-  const filtered = stores.filter((s) =>
-    s.name.toLowerCase().includes(query.toLowerCase())
-  );
+  const filtered = stores
+    .filter((s) => s.name.toLowerCase().includes(query.toLowerCase()))
+    .sort((a, b) =>
+      sortByKana ? a.name.localeCompare(b.name, "ja") : 0
+    );
 
   const shareUrl = shareToken
     ? `${typeof window !== "undefined" ? window.location.origin : ""}/shared/${shareToken}`
@@ -218,7 +221,21 @@ export default function StoresPage() {
             </div>
           )}
 
-          <StoreSearch value={query} onChange={handleQueryChange} />
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <StoreSearch value={query} onChange={handleQueryChange} />
+            </div>
+            <button
+              onClick={() => setSortByKana((v) => !v)}
+              className={`flex-shrink-0 text-xs px-3 py-2 rounded-lg border transition ${
+                sortByKana
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+              }`}
+            >
+              あ→ん
+            </button>
+          </div>
         </div>
       </div>
 
