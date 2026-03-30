@@ -9,6 +9,7 @@ type Props = {
   onSubmit: (data: StoreFormData & { latitude: number; longitude: number }) => void;
   submitLabel: string;
   loading?: boolean;
+  existingNames?: string[];
 };
 
 function parseCoords(value: string): { lat: number; lng: number } | null {
@@ -22,7 +23,7 @@ function parseCoords(value: string): { lat: number; lng: number } | null {
   return { lat, lng };
 }
 
-export default function StoreForm({ initialData, onSubmit, submitLabel, loading }: Props) {
+export default function StoreForm({ initialData, onSubmit, submitLabel, loading, existingNames }: Props) {
   const [name, setName] = useState(initialData?.name ?? "");
   const [address, setAddress] = useState(initialData?.address ?? "");
   const [coordInput, setCoordInput] = useState("");
@@ -30,6 +31,11 @@ export default function StoreForm({ initialData, onSubmit, submitLabel, loading 
   const [geocoding, setGeocoding] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSteps, setShowSteps] = useState(false);
+
+  const isDuplicate =
+    existingNames != null &&
+    name.trim().length > 0 &&
+    existingNames.some((n) => n.toLowerCase() === name.trim().toLowerCase());
 
   const handleCoordChange = (value: string) => {
     setCoordInput(value);
@@ -105,6 +111,14 @@ export default function StoreForm({ initialData, onSubmit, submitLabel, loading 
           maxLength={100}
           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        {isDuplicate && (
+          <p className="mt-1 text-sm text-amber-600 flex items-center gap-1">
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+            同じ名前の店舗がすでに登録されています
+          </p>
+        )}
       </div>
 
       {/* 座標入力 */}

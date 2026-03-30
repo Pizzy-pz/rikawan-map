@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/authContext";
-import { createStore } from "@/lib/stores";
+import { createStore, getStores } from "@/lib/stores";
 import Header from "@/components/Header";
 import StoreForm from "@/components/StoreForm";
 import { StoreFormData } from "@/types/store";
@@ -13,12 +13,19 @@ export default function NewStorePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [existingNames, setExistingNames] = useState<string[]>([]);
 
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
     }
   }, [user, loading, router]);
+
+  useEffect(() => {
+    if (user) {
+      getStores(user.id).then((stores) => setExistingNames(stores.map((s) => s.name)));
+    }
+  }, [user]);
 
   if (loading) {
     return (
@@ -53,7 +60,7 @@ export default function NewStorePage() {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <StoreForm onSubmit={handleSubmit} submitLabel="登録する" loading={saving} />
+          <StoreForm onSubmit={handleSubmit} submitLabel="登録する" loading={saving} existingNames={existingNames} />
         </div>
       </main>
     </div>

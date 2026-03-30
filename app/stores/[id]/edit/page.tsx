@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/authContext";
-import { getStore, updateStore } from "@/lib/stores";
+import { getStore, getStores, updateStore } from "@/lib/stores";
 import { Store, StoreFormData } from "@/types/store";
 import Header from "@/components/Header";
 import StoreForm from "@/components/StoreForm";
@@ -17,6 +17,7 @@ export default function EditStorePage() {
   const [store, setStore] = useState<Store | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [existingNames, setExistingNames] = useState<string[]>([]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -33,6 +34,9 @@ export default function EditStorePage() {
           setNotFound(true);
         }
       });
+      getStores(user.id).then((stores) =>
+        setExistingNames(stores.filter((s) => s.id !== id).map((s) => s.name))
+      );
     }
   }, [user, id]);
 
@@ -88,6 +92,7 @@ export default function EditStorePage() {
             onSubmit={handleSubmit}
             submitLabel="更新する"
             loading={saving}
+            existingNames={existingNames}
           />
         </div>
       </main>

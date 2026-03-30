@@ -43,8 +43,19 @@ export default function SharedPage() {
         router.push("/stores");
         return;
       }
-      const data = await getStores(ownerId);
-      setStores(data);
+      const [sharedStores, myStores] = await Promise.all([
+        getStores(ownerId),
+        getStores(user.id),
+      ]);
+      const myNames = new Set(myStores.map((s) => s.name.toLowerCase()));
+      const alreadyCopied = new Set(
+        sharedStores.filter((s) => myNames.has(s.name.toLowerCase())).map((s) => s.id)
+      );
+      setStores(sharedStores);
+      setCopied(alreadyCopied);
+      if (sharedStores.length > 0 && alreadyCopied.size === sharedStores.length) {
+        setAllCopied(true);
+      }
       setFetching(false);
     })();
   }, [user, token, router]);
