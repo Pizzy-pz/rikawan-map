@@ -31,9 +31,8 @@ export default function StoreList({ stores }: Props) {
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-gray-900 truncate">{store.name}</h3>
-                <p className="text-sm text-gray-500 mt-1 truncate">{store.address}</p>
                 {store.memo && (
-                  <p className="text-sm text-gray-400 mt-1 line-clamp-2">{store.memo}</p>
+                  <p className="text-sm text-gray-500 mt-1 line-clamp-2">{store.memo}</p>
                 )}
               </div>
               <svg className="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
