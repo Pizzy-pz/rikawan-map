@@ -43,7 +43,7 @@ export default function StoreMap({ latitude, longitude, storeName, address }: Pr
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiKey, latitude, longitude, storeName]);
 
-  const googleMapsNavUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}&travelmode=walking`;
+  const googleMapsNavUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=walking`;
 
   return (
     <div className="space-y-3">
