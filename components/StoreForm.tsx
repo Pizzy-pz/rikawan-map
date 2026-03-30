@@ -26,7 +26,11 @@ function parseCoords(value: string): { lat: number; lng: number } | null {
 export default function StoreForm({ initialData, onSubmit, submitLabel, loading, existingNames }: Props) {
   const [name, setName] = useState(initialData?.name ?? "");
   const [address, setAddress] = useState(initialData?.address ?? "");
-  const [coordInput, setCoordInput] = useState("");
+  const [coordInput, setCoordInput] = useState(
+    initialData?.latitude != null && initialData?.longitude != null
+      ? `${initialData.latitude}, ${initialData.longitude}`
+      : ""
+  );
   const [memo, setMemo] = useState(initialData?.memo ?? "");
   const [geocoding, setGeocoding] = useState(false);
   const [error, setError] = useState<string | null>(null);
