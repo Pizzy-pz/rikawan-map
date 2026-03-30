@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/authContext";
-import { getStores, createStore } from "@/lib/stores";
-import { getOrCreateShareLink, deleteShareLink, getShareLinkToken, getShareLinkOwner } from "@/lib/shareLinks";
+import { getStores } from "@/lib/stores";
+import { getOrCreateShareLink, deleteShareLink, getShareLinkToken } from "@/lib/shareLinks";
 import { Store } from "@/types/store";
 import Header from "@/components/Header";
 import StoreList from "@/components/StoreList";
@@ -13,8 +13,6 @@ import StoreSearch from "@/components/StoreSearch";
 
 const SCROLL_KEY = "stores_scroll";
 const QUERY_KEY = "stores_query";
-
-type ImportStatus = "idle" | "loading" | "loaded" | "error";
 
 export default function StoresPage() {
   const { user, loading } = useAuth();
@@ -30,16 +28,9 @@ export default function StoresPage() {
   const [shareLoading, setShareLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // リンクからコピー
   const [showImport, setShowImport] = useState(false);
   const [importUrl, setImportUrl] = useState("");
-  const [importStores, setImportStores] = useState<Store[]>([]);
-  const [importStatus, setImportStatus] = useState<ImportStatus>("idle");
   const [importError, setImportError] = useState<string | null>(null);
-  const [importCopied, setImportCopied] = useState<Set<string>>(new Set());
-  const [importCopyingOne, setImportCopyingOne] = useState<string | null>(null);
-  const [importCopyingAll, setImportCopyingAll] = useState(false);
-  const [importAllCopied, setImportAllCopied] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -98,93 +89,14 @@ export default function StoresPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleImportFetch = async () => {
-    if (!user || !importUrl.trim()) return;
-    setImportStatus("loading");
+  const handleImportGo = () => {
     setImportError(null);
-    setImportStores([]);
-    setImportCopied(new Set());
-    setImportAllCopied(false);
-
     const match = importUrl.trim().match(/\/shared\/([a-f0-9-]+)/i);
     if (!match) {
       setImportError("有効なシェアリンクを貼り付けてください");
-      setImportStatus("error");
       return;
     }
-    const token = match[1];
-    const ownerId = await getShareLinkOwner(token);
-    if (!ownerId) {
-      setImportError("このシェアリンクは無効または期限切れです");
-      setImportStatus("error");
-      return;
-    }
-    if (ownerId === user.id) {
-      setImportError("自分自身のシェアリンクはコピーできません");
-      setImportStatus("error");
-      return;
-    }
-    const [sharedStores, myStores] = await Promise.all([
-      getStores(ownerId),
-      getStores(user.id),
-    ]);
-    const myNames = new Set(myStores.map((s) => s.name.toLowerCase()));
-    const alreadyCopied = new Set(
-      sharedStores.filter((s) => myNames.has(s.name.toLowerCase())).map((s) => s.id)
-    );
-    setImportStores(sharedStores);
-    setImportCopied(alreadyCopied);
-    if (sharedStores.length > 0 && alreadyCopied.size === sharedStores.length) {
-      setImportAllCopied(true);
-    }
-    setImportStatus("loaded");
-  };
-
-  const handleImportCopyOne = async (store: Store) => {
-    if (!user || importCopyingOne) return;
-    setImportCopyingOne(store.id);
-    await createStore(user.id, {
-      name: store.name,
-      address: store.address,
-      latitude: store.latitude,
-      longitude: store.longitude,
-      memo: store.memo ?? undefined,
-    });
-    setImportCopied((prev) => new Set(prev).add(store.id));
-    setImportCopyingOne(null);
-    // 自分のリストを更新
-    getStores(user.id).then(setStores);
-  };
-
-  const handleImportCopyAll = async () => {
-    if (!user || importCopyingAll) return;
-    setImportCopyingAll(true);
-    for (const store of importStores) {
-      if (!importCopied.has(store.id)) {
-        await createStore(user.id, {
-          name: store.name,
-          address: store.address,
-          latitude: store.latitude,
-          longitude: store.longitude,
-          memo: store.memo ?? undefined,
-        });
-      }
-    }
-    setImportCopied(new Set(importStores.map((s) => s.id)));
-    setImportAllCopied(true);
-    setImportCopyingAll(false);
-    // 自分のリストを更新
-    getStores(user.id).then(setStores);
-  };
-
-  const handleImportClose = () => {
-    setShowImport(false);
-    setImportUrl("");
-    setImportStores([]);
-    setImportStatus("idle");
-    setImportError(null);
-    setImportCopied(new Set());
-    setImportAllCopied(false);
+    router.push(`/stores/import?token=${match[1]}`);
   };
 
   if (loading) {
@@ -201,7 +113,9 @@ export default function StoresPage() {
     s.name.toLowerCase().includes(query.toLowerCase())
   );
 
-  const shareUrl = shareToken ? `${typeof window !== "undefined" ? window.location.origin : ""}/shared/${shareToken}` : "";
+  const shareUrl = shareToken
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}/shared/${shareToken}`
+    : "";
 
   return (
     <div className="h-screen flex flex-col">
@@ -213,7 +127,7 @@ export default function StoresPage() {
             <h2 className="text-xl font-bold text-gray-800">店舗一覧</h2>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => { setShowImport((v) => !v); setShowShare(false); }}
+                onClick={() => { setShowImport((v) => !v); setShowShare(false); setImportError(null); }}
                 className="flex items-center gap-1.5 text-sm bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,7 +136,7 @@ export default function StoresPage() {
                 リンクから追加
               </button>
               <button
-                onClick={() => { setShowShare((v) => !v); setShowImport(false); handleImportClose(); }}
+                onClick={() => { setShowShare((v) => !v); setShowImport(false); }}
                 className="flex items-center gap-1.5 text-sm bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -239,78 +153,28 @@ export default function StoresPage() {
             </div>
           </div>
 
-          {/* リンクから追加パネル */}
           {showImport && (
-            <div className="mb-3 bg-green-50 border border-green-100 rounded-xl p-4 space-y-3">
+            <div className="mb-3 bg-green-50 border border-green-100 rounded-xl p-4 space-y-2">
               <p className="text-sm font-semibold text-green-800">リンクからリストを追加</p>
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={importUrl}
-                  onChange={(e) => { setImportUrl(e.target.value); setImportStatus("idle"); setImportError(null); }}
-                  onKeyDown={(e) => e.key === "Enter" && handleImportFetch()}
+                  onChange={(e) => { setImportUrl(e.target.value); setImportError(null); }}
+                  onKeyDown={(e) => e.key === "Enter" && handleImportGo()}
                   placeholder="シェアリンクを貼り付け"
                   className="flex-1 text-xs bg-white border border-green-200 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-400"
                 />
                 <button
-                  onClick={handleImportFetch}
-                  disabled={importStatus === "loading" || !importUrl.trim()}
+                  onClick={handleImportGo}
+                  disabled={!importUrl.trim()}
                   className="text-xs bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 transition whitespace-nowrap"
                 >
-                  {importStatus === "loading" ? "読み込み中..." : "確認"}
+                  確認
                 </button>
               </div>
-
               {importError && (
                 <p className="text-xs text-red-600">{importError}</p>
-              )}
-
-              {importStatus === "loaded" && (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs text-green-700">{importStores.length}件の店舗が見つかりました</p>
-                    {importStores.length > 0 && (
-                      <button
-                        onClick={handleImportCopyAll}
-                        disabled={importCopyingAll || importAllCopied}
-                        className="text-xs bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 disabled:opacity-50 transition"
-                      >
-                        {importCopyingAll ? "コピー中..." : importAllCopied ? "全てコピー済み ✓" : "全てコピー"}
-                      </button>
-                    )}
-                  </div>
-
-                  {importStores.length === 0 ? (
-                    <p className="text-xs text-gray-400 text-center py-2">店舗が登録されていません</p>
-                  ) : (
-                    <div className="space-y-1.5 max-h-60 overflow-y-auto">
-                      {importStores.map((store) => (
-                        <div
-                          key={store.id}
-                          className="bg-white rounded-lg border border-gray-100 px-3 py-2 flex items-center justify-between gap-3"
-                        >
-                          <p className="text-sm text-gray-800 truncate">{store.name}</p>
-                          <button
-                            onClick={() => handleImportCopyOne(store)}
-                            disabled={importCopied.has(store.id) || importCopyingOne === store.id}
-                            className="text-xs flex-shrink-0 bg-green-50 text-green-700 px-2 py-1 rounded-lg hover:bg-green-100 disabled:opacity-50 transition"
-                          >
-                            {importCopied.has(store.id) ? "追加済み ✓" : importCopyingOne === store.id ? "..." : "追加"}
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {importAllCopied && (
-                    <button
-                      onClick={handleImportClose}
-                      className="w-full text-xs text-green-700 hover:text-green-900 transition pt-1"
-                    >
-                      閉じる
-                    </button>
-                  )}
-                </div>
               )}
             </div>
           )}
