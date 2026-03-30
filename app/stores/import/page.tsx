@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/authContext";
@@ -9,7 +9,7 @@ import { getStores, createStore } from "@/lib/stores";
 import { Store } from "@/types/store";
 import Header from "@/components/Header";
 
-export default function ImportPage() {
+function ImportContent() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -184,5 +184,17 @@ export default function ImportPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function ImportPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-400">読み込み中...</div>
+      </div>
+    }>
+      <ImportContent />
+    </Suspense>
   );
 }
