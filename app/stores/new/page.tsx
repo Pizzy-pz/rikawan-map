@@ -1,3 +1,10 @@
+/**
+ * 店舗新規登録ページ（/stores/new）
+ *
+ * StoreForm コンポーネントを使って新しい店舗を登録する。
+ * - マウント時に既存の店名一覧を取得し、重複警告に使用する
+ * - フォーム送信後は登録した店舗の詳細ページへリダイレクト
+ */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -15,12 +22,14 @@ export default function NewStorePage() {
   const [saving, setSaving] = useState(false);
   const [existingNames, setExistingNames] = useState<string[]>([]);
 
+  // 未ログインならログインページへリダイレクト
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
     }
   }, [user, loading, router]);
 
+  // 既存の店名一覧を取得（重複警告のため）
   useEffect(() => {
     if (user) {
       getStores(user.id).then((stores) => setExistingNames(stores.map((s) => s.name)));
@@ -37,6 +46,7 @@ export default function NewStorePage() {
 
   if (!user) return null;
 
+  /** フォーム送信時: DB に保存 → 詳細ページへ遷移 */
   const handleSubmit = async (data: StoreFormData & { latitude: number; longitude: number }) => {
     setSaving(true);
     const store = await createStore(user.id, data);

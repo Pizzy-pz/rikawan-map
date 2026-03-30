@@ -1,3 +1,16 @@
+/**
+ * 店舗一覧コンポーネント
+ *
+ * 店舗リストを表示する。2つのモードがある:
+ *
+ * 通常モード（selectable = false）:
+ *   - 各店舗は詳細ページへのリンク
+ *
+ * 選択削除モード（selectable = true）:
+ *   - 各店舗はチェックボックス付きのボタン
+ *   - 選択された店舗は赤くハイライト
+ *   - onToggleSelect で親に選択状態を通知
+ */
 "use client";
 
 import Link from "next/link";
@@ -5,12 +18,13 @@ import { Store } from "@/types/store";
 
 type Props = {
   stores: Store[];
-  selectable?: boolean;
-  selectedIds?: Set<string>;
-  onToggleSelect?: (id: string) => void;
+  selectable?: boolean;                      // 選択削除モードかどうか
+  selectedIds?: Set<string>;                 // 選択中の店舗IDセット
+  onToggleSelect?: (id: string) => void;     // 選択/解除のコールバック
 };
 
 export default function StoreList({ stores, selectable, selectedIds, onToggleSelect }: Props) {
+  // 店舗がない場合は空状態メッセージを表示
   if (stores.length === 0) {
     return (
       <div className="text-center py-16 text-gray-500">
@@ -28,6 +42,7 @@ export default function StoreList({ stores, selectable, selectedIds, onToggleSel
       {stores.map((store) => {
         const isSelected = selectedIds?.has(store.id) ?? false;
 
+        // --- 選択削除モード ---
         if (selectable) {
           return (
             <li key={store.id}>
@@ -35,10 +50,11 @@ export default function StoreList({ stores, selectable, selectedIds, onToggleSel
                 onClick={() => onToggleSelect?.(store.id)}
                 className={`w-full text-left border rounded-lg p-4 transition flex items-center gap-3 ${
                   isSelected
-                    ? "bg-red-50 border-red-300"
+                    ? "bg-red-50 border-red-300"   // 選択中: 赤いハイライト
                     : "bg-white border-gray-200 hover:border-gray-300"
                 }`}
               >
+                {/* チェックボックス（円形） */}
                 <span className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                   isSelected ? "border-red-500 bg-red-500" : "border-gray-300"
                 }`}>
@@ -59,6 +75,7 @@ export default function StoreList({ stores, selectable, selectedIds, onToggleSel
           );
         }
 
+        // --- 通常モード（詳細ページへのリンク） ---
         return (
           <li key={store.id}>
             <Link
@@ -68,10 +85,12 @@ export default function StoreList({ stores, selectable, selectedIds, onToggleSel
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-gray-900 truncate">{store.name}</h3>
+                  {/* メモがある場合のみ表示（最大2行） */}
                   {store.memo && (
                     <p className="text-sm text-gray-500 mt-1 line-clamp-2">{store.memo}</p>
                   )}
                 </div>
+                {/* 右矢印アイコン */}
                 <svg className="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>

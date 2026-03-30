@@ -1,3 +1,12 @@
+/**
+ * 店舗編集ページ（/stores/[id]/edit）
+ *
+ * 既存の店舗情報を StoreForm で編集する。
+ * - URLパラメータ [id] から対象店舗を取得
+ * - 他ユーザーの店舗はアクセス不可（getStore が user_id で絞り込む）
+ * - 重複警告のため、編集中の店舗以外の店名一覧も取得する
+ * - 更新後は詳細ページへリダイレクト
+ */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -13,12 +22,13 @@ export default function EditStorePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const id = params.id as string;
+  const id = params.id as string; // URLの [id] を取得
   const [store, setStore] = useState<Store | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [saving, setSaving] = useState(false);
   const [existingNames, setExistingNames] = useState<string[]>([]);
 
+  // 未ログインならログインページへリダイレクト
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
@@ -27,6 +37,7 @@ export default function EditStorePage() {
 
   useEffect(() => {
     if (user && id) {
+      // 対象の店舗データを取得（自分の店舗のみ取得される）
       getStore(id, user.id).then((found) => {
         if (found) {
           setStore(found);
@@ -34,6 +45,7 @@ export default function EditStorePage() {
           setNotFound(true);
         }
       });
+      // 重複警告用に、編集中の店舗以外の店名一覧を取得
       getStores(user.id).then((stores) =>
         setExistingNames(stores.filter((s) => s.id !== id).map((s) => s.name))
       );
@@ -64,8 +76,10 @@ export default function EditStorePage() {
     );
   }
 
+  // store の取得が完了するまで何も表示しない
   if (!store) return null;
 
+  /** フォーム送信時: DB を更新 → 詳細ページへ遷移 */
   const handleSubmit = async (data: StoreFormData & { latitude: number; longitude: number }) => {
     setSaving(true);
     await updateStore(id, user.id, data);
@@ -87,6 +101,7 @@ export default function EditStorePage() {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          {/* initialData で現在の値をフォームに初期セット（座標も含む） */}
           <StoreForm
             initialData={{ name: store.name, address: store.address, memo: store.memo, latitude: store.latitude, longitude: store.longitude }}
             onSubmit={handleSubmit}

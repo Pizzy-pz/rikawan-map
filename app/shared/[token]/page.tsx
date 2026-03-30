@@ -1,3 +1,17 @@
+/**
+ * シェアリンク閲覧ページ（/shared/[token]）
+ *
+ * 他ユーザーが共有した店舗リストを閲覧・コピーするページ。
+ * URLの [token] からリンクの所有者を特定し、その店舗一覧を表示する。
+ *
+ * 重複コピー防止:
+ * - 自分の既存店舗と同名の店舗は「コピー済み」として扱う
+ *
+ * アクセス制御:
+ * - ログイン必須（未ログインはログインページへリダイレクト）
+ * - 自分のリンクにアクセスした場合は店舗一覧ページへリダイレクト
+ * - 無効なトークンはエラーを表示
+ */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -13,16 +27,17 @@ export default function SharedPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const token = params.token as string;
+  const token = params.token as string; // URLの [token] を取得
 
   const [stores, setStores] = useState<Store[]>([]);
-  const [invalid, setInvalid] = useState(false);
+  const [invalid, setInvalid] = useState(false);       // 無効なトークンフラグ
   const [fetching, setFetching] = useState(true);
-  const [copying, setCopying] = useState<string | null>(null);
+  const [copying, setCopying] = useState<string | null>(null); // コピー中の店舗ID
   const [copyingAll, setCopyingAll] = useState(false);
-  const [copied, setCopied] = useState<Set<string>>(new Set());
+  const [copied, setCopied] = useState<Set<string>>(new Set()); // コピー済みの店舗IDセット
   const [allCopied, setAllCopied] = useState(false);
 
+  // 未ログインならログインページへ
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
@@ -33,26 +48,36 @@ export default function SharedPage() {
     if (!user || !token) return;
 
     (async () => {
+      // トークンからリンクの所有者を取得
       const ownerId = await getShareLinkOwner(token);
       if (!ownerId) {
-        setInvalid(true);
+        setInvalid(true); // 存在しないトークン
         setFetching(false);
         return;
       }
+      // 自分自身のリンクにアクセスした場合は自分の一覧ページへ
       if (ownerId === user.id) {
         router.push("/stores");
         return;
       }
+
+      // 共有された店舗リストと自分の店舗リストを並行取得
       const [sharedStores, myStores] = await Promise.all([
         getStores(ownerId),
         getStores(user.id),
       ]);
+
+      // 自分が既に持っている店名（大文字小文字を無視）
       const myNames = new Set(myStores.map((s) => s.name.toLowerCase()));
+
+      // 同名の店舗を「コピー済み」として初期設定（重複コピー防止）
       const alreadyCopied = new Set(
         sharedStores.filter((s) => myNames.has(s.name.toLowerCase())).map((s) => s.id)
       );
       setStores(sharedStores);
       setCopied(alreadyCopied);
+
+      // 全店舗がすでにコピー済みの場合
       if (sharedStores.length > 0 && alreadyCopied.size === sharedStores.length) {
         setAllCopied(true);
       }
@@ -60,6 +85,7 @@ export default function SharedPage() {
     })();
   }, [user, token, router]);
 
+  /** 1件コピー */
   const handleCopyOne = async (store: Store) => {
     if (!user || copying) return;
     setCopying(store.id);
@@ -74,6 +100,7 @@ export default function SharedPage() {
     setCopying(null);
   };
 
+  /** 全件コピー（コピー済みをスキップ） */
   const handleCopyAll = async () => {
     if (!user || copyingAll) return;
     setCopyingAll(true);
@@ -103,6 +130,7 @@ export default function SharedPage() {
 
   if (!user) return null;
 
+  // 無効なトークンの場合
   if (invalid) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -164,6 +192,7 @@ export default function SharedPage() {
           </div>
         )}
 
+        {/* 全コピー完了後に自分のリストへ誘導するボタンを表示 */}
         {allCopied && (
           <div className="mt-6 text-center">
             <Link
