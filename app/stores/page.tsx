@@ -198,54 +198,44 @@ export default function StoresPage() {
               </div>
             </div>
           ) : (
-            /* 通常モード ヘッダー 2段 */
+            /* 通常モード ヘッダー */
             <>
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-xl font-bold text-gray-800">店舗一覧</h2>
                 <Link
                   href="/stores/new"
-                  className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-700 transition"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition"
                 >
                   + 新規登録
                 </Link>
               </div>
-              <div className="flex flex-wrap items-center gap-1.5 mb-2">
+              <div className="flex gap-1.5 mb-2">
                 <button
                   onClick={() => { setShowImport((v) => !v); setShowShare(false); setImportError(null); }}
-                  className={`flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg border transition ${showImport ? "bg-green-600 text-white border-green-600" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"}`}
+                  className={`flex-1 flex items-center justify-center gap-1 text-xs py-2 rounded-lg border transition ${showImport ? "bg-green-600 text-white border-green-600" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"}`}
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                   </svg>
-                  リンクから追加
+                  <span>リンクから追加</span>
                 </button>
                 <button
                   onClick={() => { setShowShare((v) => !v); setShowImport(false); }}
-                  className={`flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg border transition ${showShare ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"}`}
+                  className={`flex-1 flex items-center justify-center gap-1 text-xs py-2 rounded-lg border transition ${showShare ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"}`}
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                   </svg>
-                  シェア
+                  <span>シェア</span>
                 </button>
                 <button
                   onClick={() => { setSelecting(true); setShowImport(false); setShowShare(false); }}
-                  className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg border bg-white text-gray-600 border-gray-300 hover:bg-gray-50 transition"
+                  className="flex-1 flex items-center justify-center gap-1 text-xs py-2 rounded-lg border bg-white text-gray-600 border-gray-300 hover:bg-gray-50 transition"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                   </svg>
-                  選択削除
-                </button>
-                <button
-                  onClick={() => setSortByKana((v) => {
-                    const next = !v;
-                    sessionStorage.setItem("stores_sort", next ? "kana" : "default");
-                    return next;
-                  })}
-                  className={`text-xs px-2.5 py-1.5 rounded-lg border transition ${sortByKana ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"}`}
-                >
-                  あ→ん
+                  <span>選択削除</span>
                 </button>
               </div>
             </>
@@ -314,11 +304,21 @@ export default function StoresPage() {
             </div>
           )}
 
-          <div className="flex items-center gap-2">
-            <div className="flex-1">
-              <StoreSearch value={query} onChange={handleQueryChange} />
+          <StoreSearch value={query} onChange={handleQueryChange} />
+          {!selecting && (
+            <div className="flex justify-end mt-1.5">
+              <button
+                onClick={() => setSortByKana((v) => {
+                  const next = !v;
+                  sessionStorage.setItem("stores_sort", next ? "kana" : "default");
+                  return next;
+                })}
+                className={`text-xs px-3 py-1 rounded-full border transition ${sortByKana ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-500 border-gray-300 hover:bg-gray-50"}`}
+              >
+                あいう…
+              </button>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
