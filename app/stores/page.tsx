@@ -315,7 +315,7 @@ export default function StoresPage() {
                 })}
                 className={`text-xs px-3 py-1 rounded-full border transition ${sortByKana ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-500 border-gray-300 hover:bg-gray-50"}`}
               >
-                あいう…
+                50音順
               </button>
             </div>
           )}
