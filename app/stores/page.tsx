@@ -31,7 +31,9 @@ export default function StoresPage() {
   const [showImport, setShowImport] = useState(false);
   const [importUrl, setImportUrl] = useState("");
   const [importError, setImportError] = useState<string | null>(null);
-  const [sortByKana, setSortByKana] = useState(false);
+  const [sortByKana, setSortByKana] = useState(() =>
+    typeof window !== "undefined" ? sessionStorage.getItem("stores_sort") === "kana" : false
+  );
 
   useEffect(() => {
     if (!loading && !user) {
@@ -226,7 +228,11 @@ export default function StoresPage() {
               <StoreSearch value={query} onChange={handleQueryChange} />
             </div>
             <button
-              onClick={() => setSortByKana((v) => !v)}
+              onClick={() => setSortByKana((v) => {
+                const next = !v;
+                sessionStorage.setItem("stores_sort", next ? "kana" : "default");
+                return next;
+              })}
               className={`flex-shrink-0 text-xs px-3 py-2 rounded-lg border transition ${
                 sortByKana
                   ? "bg-blue-600 text-white border-blue-600"
