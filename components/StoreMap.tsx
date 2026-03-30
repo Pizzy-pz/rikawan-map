@@ -10,17 +10,15 @@ type Props = {
   address: string;
 };
 
-export default function StoreMap({ latitude, longitude, storeName, address }: Props) {
+export default function StoreMap({ latitude, longitude, storeName }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapReady, setMapReady] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
 
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-
   useEffect(() => {
-    if (!apiKey || !mapRef.current) return;
+    if (!mapRef.current) return;
 
-    loadGoogleMapsScript(apiKey)
+    loadGoogleMapsScript()
       .then(() => {
         if (!mapRef.current) return;
         const position = { lat: latitude, lng: longitude };
@@ -41,30 +39,28 @@ export default function StoreMap({ latitude, longitude, storeName, address }: Pr
       })
       .catch(() => setInitError("地図の読み込みに失敗しました"));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiKey, latitude, longitude, storeName]);
+  }, [latitude, longitude, storeName]);
 
   const googleMapsNavUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=walking`;
 
   return (
     <div className="space-y-3">
-      {apiKey && (
-        <div className="relative">
-          <div
-            ref={mapRef}
-            className="w-full h-96 rounded-xl border border-gray-200 bg-gray-100"
-          />
-          {!mapReady && !initError && (
-            <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-gray-100/80">
-              <span className="text-gray-500 text-sm">地図を読み込み中...</span>
-            </div>
-          )}
-          {initError && (
-            <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-gray-100">
-              <span className="text-red-500 text-sm">{initError}</span>
-            </div>
-          )}
-        </div>
-      )}
+      <div className="relative">
+        <div
+          ref={mapRef}
+          className="w-full h-96 rounded-xl border border-gray-200 bg-gray-100"
+        />
+        {!mapReady && !initError && (
+          <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-gray-100/80">
+            <span className="text-gray-500 text-sm">地図を読み込み中...</span>
+          </div>
+        )}
+        {initError && (
+          <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-gray-100">
+            <span className="text-red-500 text-sm">{initError}</span>
+          </div>
+        )}
+      </div>
 
       <a
         href={googleMapsNavUrl}

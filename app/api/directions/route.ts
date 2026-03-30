@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+import { verifyAuth } from "@/lib/apiAuth";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export async function GET(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? "unknown";
+  if (!checkRateLimit(`directions:${ip}`)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
+  const authenticated = await verifyAuth(req);
+  if (!authenticated) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { searchParams } = req.nextUrl;
   const originLat = searchParams.get("originLat");
   const originLng = searchParams.get("originLng");

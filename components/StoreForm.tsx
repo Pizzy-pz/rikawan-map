@@ -20,6 +20,7 @@ function parseCoords(value: string): { lat: number; lng: number } | null {
   const lat = parseFloat(match[1]);
   const lng = parseFloat(match[2]);
   if (isNaN(lat) || isNaN(lng)) return null;
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
   return { lat, lng };
 }
 
@@ -60,7 +61,11 @@ export default function StoreForm({ initialData, onSubmit, submitLabel, loading,
 
     // 座標が入力されている場合
     const parsed = parseCoords(coordInput);
-    if (parsed) {
+    if (coordInput.trim()) {
+      if (!parsed) {
+        setError("座標の形式が正しくありません（緯度: -90〜90、経度: -180〜180）");
+        return;
+      }
       onSubmit({
         name: name.trim(),
         address: address.trim(),

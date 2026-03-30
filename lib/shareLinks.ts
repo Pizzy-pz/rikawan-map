@@ -9,9 +9,10 @@ export async function getOrCreateShareLink(userId: string): Promise<string | nul
 
   if (existing) return existing.token;
 
+  const token = crypto.randomUUID();
   const { data, error } = await supabase
     .from("share_links")
-    .insert({ owner_user_id: userId })
+    .insert({ owner_user_id: userId, token })
     .select("token")
     .single();
 

@@ -1,6 +1,15 @@
 import { supabase } from "./supabase";
 import { Store, StoreFormData } from "@/types/store";
 
+function validateStoreInput(data: StoreFormData & { latitude: number; longitude: number }) {
+  if (!data.name || data.name.trim().length === 0) throw new Error("店名は必須です");
+  if (data.name.length > 100) throw new Error("店名は100文字以内で入力してください");
+  if (data.address && data.address.length > 200) throw new Error("住所は200文字以内で入力してください");
+  if (data.memo && data.memo.length > 500) throw new Error("メモは500文字以内で入力してください");
+  if (data.latitude < -90 || data.latitude > 90) throw new Error("緯度の値が不正です (-90〜90)");
+  if (data.longitude < -180 || data.longitude > 180) throw new Error("経度の値が不正です (-180〜180)");
+}
+
 export async function getStores(userId: string): Promise<Store[]> {
   const { data, error } = await supabase
     .from("stores")
@@ -26,6 +35,7 @@ export async function createStore(
   userId: string,
   data: StoreFormData & { latitude: number; longitude: number }
 ): Promise<Store | null> {
+  validateStoreInput(data);
   const { data: store, error } = await supabase
     .from("stores")
     .insert({
@@ -47,6 +57,7 @@ export async function updateStore(
   userId: string,
   data: StoreFormData & { latitude: number; longitude: number }
 ): Promise<Store | null> {
+  validateStoreInput(data);
   const { data: store, error } = await supabase
     .from("stores")
     .update({

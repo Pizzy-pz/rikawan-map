@@ -1,9 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
+import { verifyAuth } from "@/lib/apiAuth";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export async function GET(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? "unknown";
+  if (!checkRateLimit(`geocode:${ip}`)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
+  const authenticated = await verifyAuth(req);
+  if (!authenticated) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const address = req.nextUrl.searchParams.get("address");
   if (!address) {
     return NextResponse.json({ error: "address is required" }, { status: 400 });
+  }
+  if (address.length > 300) {
+    return NextResponse.json({ error: "address is too long" }, { status: 400 });
   }
 
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
