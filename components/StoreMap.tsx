@@ -33,33 +33,29 @@ export default function StoreMap({ latitude, longitude, storeName, address }: Pr
     }
 
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const origin = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        const destination = { lat: latitude, lng: longitude };
+      async (pos) => {
+        try {
+          const res = await fetch(
+            `/api/directions?originLat=${pos.coords.latitude}&originLng=${pos.coords.longitude}&destLat=${latitude}&destLng=${longitude}`
+          );
+          const data = await res.json();
 
-        const directionsService = new window.google.maps.DirectionsService();
-        const directionsRenderer = new window.google.maps.DirectionsRenderer();
-
-        directionsService.route(
-          {
-            origin,
-            destination,
-            travelMode: window.google.maps.TravelMode.WALKING,
-          },
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (result: any, status: any) => {
+          if (!res.ok || data.error) {
+            setError("ルートを取得できませんでした。住所を確認してください。");
             setRouteLoading(false);
-            if (status === "OK" && result) {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              directionsRenderer.setMap(map as any);
-              directionsRenderer.setDirections(result);
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (map as any).fitBounds(result.routes[0].bounds);
-            } else {
-              setError("ルートを取得できませんでした。住所を確認してください。");
-            }
+            return;
           }
-        );
+
+          const directionsRenderer = new window.google.maps.DirectionsRenderer();
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          directionsRenderer.setMap(map as any);
+          directionsRenderer.setDirections(data);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (map as any).fitBounds(data.routes[0].bounds);
+        } catch {
+          setError("ルートを取得できませんでした。");
+        }
+        setRouteLoading(false);
       },
       (err) => {
         setRouteLoading(false);
