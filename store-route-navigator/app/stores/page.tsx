@@ -42,6 +42,7 @@ export default function StoresPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState(false);
   const [deleteProgress, setDeleteProgress] = useState(0);
+  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -133,9 +134,9 @@ export default function StoresPage() {
 
   const handleBulkDelete = async () => {
     if (!user || selectedIds.size === 0) return;
-    if (!confirm(`選択した${selectedIds.size}件の店舗を削除しますか？\nこの操作は取り消せません。`)) return;
     setDeleting(true);
     setDeleteProgress(0);
+    setShowBulkDeleteConfirm(false);
     const ids = Array.from(selectedIds);
     for (let i = 0; i < ids.length; i++) {
       await deleteStore(ids[i], user.id);
@@ -196,7 +197,7 @@ export default function StoresPage() {
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={handleBulkDelete}
+                  onClick={() => setShowBulkDeleteConfirm(true)}
                   disabled={selectedIds.size === 0 || deleting}
                   className="text-xs bg-red-500 text-white px-3 py-1.5 rounded-lg hover:bg-red-600 disabled:opacity-40 transition"
                 >
@@ -356,6 +357,31 @@ export default function StoresPage() {
           )}
         </div>
       </div>
+
+      {showBulkDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 mx-4 max-w-sm w-full shadow-lg">
+            <p className="text-gray-800 font-medium mb-1">
+              {selectedIds.size}件の店舗を削除しますか？
+            </p>
+            <p className="text-sm text-gray-500 mb-6">この操作は取り消せません。</p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowBulkDeleteConfirm(false)}
+                className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition text-sm"
+              >
+                いいえ
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition text-sm"
+              >
+                はい
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
