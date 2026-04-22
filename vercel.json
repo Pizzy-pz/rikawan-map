@@ -1,3 +1,8 @@
 {
-  "rootDirectory": "store-route-navigator"
+  "builds": [
+    {
+      "src": "store-route-navigator/package.json",
+      "use": "@vercel/next"
+    }
+  ]
 }
