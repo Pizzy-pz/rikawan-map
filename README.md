@@ -1,0 +1,118 @@
+# STORE-ROUTE-NAVIGATOR
+
+アルバイトで働いている酒屋（リカーショップワン）の配達業務を効率化するためにAIを用いて個人制作したWebアプリです。
+
+---
+
+## 設計
+[サイトマップ](./設計/サイトマップ.jpg) / [ER図](./設計/ER図.png) / [API設計書](./設計/API設計書.png) / [インフラ構成図](./設計/インフラ構成図.png) <br>
+[フローチャート(全体図)](./設計/フローチャート_ログインからの全体図.png) / [フローチャート(シェア・インポート)](./設計/フローチャート_シェア・インポート.png) / [フローチャート(登録・編集)](./設計/フローチャート_登録編集.png)
+
+---
+
+## デモ
+
+以下のダミーアカウントでログインして機能を試せます。
+
+- **メールアドレス**: [exam@gmail.com](mailto:exam@gmail.com)
+- **パスワード**: exam12345
+
+---
+
+## 主な機能
+
+
+| 機能         | 説明                                       |
+| ---------- | ---------------------------------------- |
+| 店舗一覧・検索    | 登録した店舗を一覧表示。名前でリアルタイム検索・50音順ソートができます     |
+| 店舗登録・編集    | 店名・住所・メモ・座標を登録。同名店舗の重複警告もあります            |
+| 地図表示       | 店舗詳細でGoogleマップが表示され、現在地からのルート案内に飛べます     |
+| シェアリンク     | URLを発行して、ログイン済みの別ユーザーに自分のリストを共有できます      |
+| リンクからインポート | 他のユーザーのシェアリンクから店舗をまるごと自分のリストに取り込めます      |
+| 一括削除       | 複数店舗をチェックしてまとめて削除できます                    |
+| ログイン認証     | メールアドレス＋パスワードでログイン。データはユーザーごとに分かれて管理されます |
+
+
+---
+
+## 使用技術
+
+### Next.js (App Router)
+
+ページの表示が速く、ファイルを置くだけでURLのルーティングが決まる仕組みが便利で選びました。
+Vercelとの相性もよいことも理由です。
+
+### TypeScript
+
+店舗データとして店名・住所・緯度経度・メモなど複数の項目を扱うため、
+型を定義して画面側とDB側のデータの不整合を防ぐことを目的に採用しました。
+どこに何のデータが入るかを明示することで、開発中のミスを減らすことができます。
+
+### Supabase
+
+PostgreSQLベースのBaaS。DBの用意からユーザー認証まで全部まとめて行えるため、
+バックエンドを自前で書かなくていいので学習コストを最小にできました。
+
+### Google Maps API
+
+店舗の地図表示とルート案内のために使用。
+座標があれば精度の高いピン表示、なければ店名や住所で検索に飛ばす形にしています。
+
+### Tailwind CSS
+
+最速で実装するために、最低限のUIを組むのに向いていました。
+レスポンシブデザインも書きやすいというメリットがあります。
+
+### Vercel
+
+GitHubと連携させると、pushするだけで自動デプロイされるため、スピード感を持った開発に向いていると思い選定しました。
+
+---
+
+## 背景・こだわり
+
+小規模な配達先の店舗情報は、Googleマップに載っていないケースが意外と多く、雑居ビルの中にあったり、
+看板がなかったり、入口が路地裏で分かりにくいという事があります。今まではスタッフの口頭伝達か個人のメモに頼るしかなかったので、
+新人が一人で配達に行けるようになるまで時間がかかっていました。「自分の不便とお店の抱える課題を自分でなんとかしたい」という気持ちで作りました。
+まずは課題を解決することにフォーカスを置いて、必要であれば新しく学び、フィードバックがあれば改善する。そのようなスタンスで作成・改善をしているアプリです。
+
+工夫点は、以下の３点です。<br>
+①APIエラーの対応としてレスポンスが返らないケースを想定したエラーハンドリングの実装<br>
+②プロキシ処理としてバリデーション、レート制限、認証チェックを搭載<br>
+③住所を座標方式にすることでGoogle検索で出てこない店舗へ対応<br>
+大変だったこと<br>
+APIキーのブラウザ露出を防ぎつつ、ユーザーが利用できるようにすることです。
+
+---
+
+<img width="1240" height="1754" alt="Image" src="https://github.com/user-attachments/assets/77a309a4-95b9-4e12-b585-0b59c823f784" />
+
+<img width="741" height="945" alt="Image" src="https://github.com/user-attachments/assets/78cf8562-d5b3-4019-a709-7438914ee07d" />
+
+<img width="1200" height="831" alt="Image" src="https://github.com/user-attachments/assets/ef5b3310-d86e-4e58-a115-eb77338736f7" />
+
+<img width="1384" height="1123" alt="Image" src="https://github.com/user-attachments/assets/65456363-fc8e-4a80-8630-9ebe992240e9" />
+
+<img width="1764" height="4588" alt="Image" src="https://github.com/user-attachments/assets/bce5a21c-7a4f-4ae0-87f8-0eb0c73c7978" />
+
+<img width="2368" height="3824" alt="Image" src="https://github.com/user-attachments/assets/cb303931-0b3a-4714-bed4-3c16568a5eb5" />
+
+<img width="1502" height="4058" alt="Image" src="https://github.com/user-attachments/assets/833453dc-bafc-4e56-a147-a41c77915813" />
+
+---
+
+## 各画面の機能説明です
+
+<img width="2480" height="1024" alt="Image" src="https://github.com/user-attachments/assets/9a5eee94-f618-4f78-a5cb-4b4ef3e61dfb" />
+
+<img width="2480" height="1250" alt="Image" src="https://github.com/user-attachments/assets/0ef93123-e074-40e8-92be-e7776796e537" />
+
+<img width="2480" height="1436" alt="Image" src="https://github.com/user-attachments/assets/0c6964be-2ec6-4628-86d6-39eb891ee953" />
+
+<img width="2480" height="1556" alt="Image" src="https://github.com/user-attachments/assets/85d977f4-0cb3-4116-a5af-5f7daaf6815e" />
+
+<img width="2480" height="1328" alt="Image" src="https://github.com/user-attachments/assets/61835923-6288-4ca0-9101-f29b05b29048" />
+
+<img width="2480" height="982" alt="Image" src="https://github.com/user-attachments/assets/fac7e5dd-0217-4c3f-ad63-53d1f16ef626" />
+
+<img width="2480" height="1540" alt="Image" src="https://github.com/user-attachments/assets/be3766be-1de0-48d6-a3cd-7785434735da" />
