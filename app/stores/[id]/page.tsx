@@ -16,6 +16,8 @@ export default function StoreDetailPage() {
   const id = params.id as string;
   const [store, setStore] = useState<Store | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -61,10 +63,18 @@ export default function StoreDetailPage() {
 
   if (!store) return null;
 
+  const openDeleteConfirm = () => setShowDeleteConfirm(true);
+
   const handleDelete = async () => {
-    if (!confirm(`「${store.name}」を削除しますか？\nこの操作は取り消せません。`)) return;
-    await deleteStore(id, user.id);
-    router.push("/stores");
+    setDeleting(true);
+    const success = await deleteStore(id, user.id);
+    if (success) {
+      router.push("/stores");
+    } else {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
+      alert("削除に失敗しました。再度お試しください。");
+    }
   };
 
   return (
@@ -91,7 +101,7 @@ export default function StoreDetailPage() {
                 編集
               </Link>
               <button
-                onClick={handleDelete}
+                onClick={openDeleteConfirm}
                 className="text-sm bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 transition"
               >
                 削除
@@ -118,6 +128,31 @@ export default function StoreDetailPage() {
           <p className="text-xs text-gray-300 text-right">{store.address}</p>
         </div>
       </main>
+
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 mx-4 max-w-sm w-full shadow-lg">
+            <p className="text-gray-800 font-medium mb-1">「{store.name}」を削除しますか？</p>
+            <p className="text-sm text-gray-500 mb-6">この操作は取り消せません。</p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleting}
+                className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition text-sm"
+              >
+                いいえ
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition text-sm disabled:opacity-50"
+              >
+                {deleting ? "削除中..." : "はい"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
