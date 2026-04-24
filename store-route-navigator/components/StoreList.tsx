@@ -10,6 +10,8 @@ type Props = {
   onToggleSelect?: (id: string) => void;
   shareMode?: boolean;
   sharedNames?: Set<string>;
+  unshareSelectedNames?: Set<string>;
+  onToggleUnshareSelect?: (name: string) => void;
 };
 
 export default function StoreList({
@@ -19,6 +21,8 @@ export default function StoreList({
   onToggleSelect,
   shareMode,
   sharedNames,
+  unshareSelectedNames,
+  onToggleUnshareSelect,
 }: Props) {
   if (stores.length === 0) {
     return (
@@ -70,43 +74,75 @@ export default function StoreList({
           );
         }
 
-        // --- シェアモード（青） ---
+        // --- シェアモード ---
         if (shareMode) {
+          const isUnshareSelected = unshareSelectedNames?.has(store.name.toLowerCase()) ?? false;
+
+          if (isShared) {
+            // シェア済み → オレンジで取り消し選択できる
+            return (
+              <li key={store.id}>
+                <button
+                  onClick={() => onToggleUnshareSelect?.(store.name)}
+                  className={`w-full text-left border rounded-lg p-4 transition flex items-center gap-3 ${
+                    isUnshareSelected
+                      ? "bg-orange-50 border-orange-300"
+                      : "bg-white border-gray-200 hover:border-orange-300"
+                  }`}
+                >
+                  <span className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                    isUnshareSelected ? "border-orange-400 bg-orange-400" : "border-gray-300 bg-gray-100"
+                  }`}>
+                    {isUnshareSelected ? (
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    ) : (
+                      <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-gray-900 truncate">{store.name}</h3>
+                      <span className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ${
+                        isUnshareSelected ? "text-orange-600 bg-orange-100" : "text-gray-400 bg-gray-100"
+                      }`}>
+                        {isUnshareSelected ? "取り消し予定" : "シェア済み"}
+                      </span>
+                    </div>
+                    {store.memo && (
+                      <p className="text-sm text-gray-500 mt-1 line-clamp-2">{store.memo}</p>
+                    )}
+                  </div>
+                </button>
+              </li>
+            );
+          }
+
+          // 未シェア → 青で選択できる
           return (
             <li key={store.id}>
               <button
-                onClick={() => !isShared && onToggleSelect?.(store.id)}
-                disabled={isShared}
+                onClick={() => onToggleSelect?.(store.id)}
                 className={`w-full text-left border rounded-lg p-4 transition flex items-center gap-3 ${
-                  isShared
-                    ? "bg-gray-50 border-gray-200 cursor-default opacity-60"
-                    : isSelected
+                  isSelected
                     ? "bg-blue-50 border-blue-300"
                     : "bg-white border-gray-200 hover:border-blue-300"
                 }`}
               >
                 <span className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                  isShared
-                    ? "border-gray-300 bg-gray-300"
-                    : isSelected
-                    ? "border-blue-500 bg-blue-500"
-                    : "border-gray-300"
+                  isSelected ? "border-blue-500 bg-blue-500" : "border-gray-300"
                 }`}>
-                  {(isSelected || isShared) && (
+                  {isSelected && (
                     <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   )}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-gray-900 truncate">{store.name}</h3>
-                    {isShared && (
-                      <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full whitespace-nowrap">
-                        シェア済み
-                      </span>
-                    )}
-                  </div>
+                  <h3 className="font-semibold text-gray-900 truncate">{store.name}</h3>
                   {store.memo && (
                     <p className="text-sm text-gray-500 mt-1 line-clamp-2">{store.memo}</p>
                   )}

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/authContext";
 import { getStores, deleteStore } from "@/lib/stores";
-import { getMySharedNames, uploadMultipleToPublicStores } from "@/lib/publicStores";
+import { getMySharedNames, uploadMultipleToPublicStores, removeMultipleFromPublicStores } from "@/lib/publicStores";
 import { Store } from "@/types/store";
 import Header from "@/components/Header";
 import StoreList from "@/components/StoreList";
@@ -34,6 +34,7 @@ export default function StoresPage() {
   // シェアモード
   const [shareMode, setShareMode] = useState(false);
   const [shareSelectedIds, setShareSelectedIds] = useState<Set<string>>(new Set());
+  const [unshareSelectedNames, setUnshareSelectedNames] = useState<Set<string>>(new Set());
   const [sharedNames, setSharedNames] = useState<Set<string>>(new Set());
   const [sharing, setSharing] = useState(false);
 
@@ -119,6 +120,24 @@ export default function StoresPage() {
   const handleCancelShareMode = () => {
     setShareMode(false);
     setShareSelectedIds(new Set());
+    setUnshareSelectedNames(new Set());
+  };
+
+  const handleToggleUnshareSelect = (name: string) => {
+    setUnshareSelectedNames((prev) => {
+      const next = new Set(prev);
+      next.has(name.toLowerCase()) ? next.delete(name.toLowerCase()) : next.add(name.toLowerCase());
+      return next;
+    });
+  };
+
+  const handleSelectAllUnshared = () => {
+    const unshared = filtered.filter((s) => !sharedNames.has(s.name.toLowerCase()));
+    if (shareSelectedIds.size === unshared.length && unshared.length > 0) {
+      setShareSelectedIds(new Set());
+    } else {
+      setShareSelectedIds(new Set(unshared.map((s) => s.id)));
+    }
   };
 
   const handleShare = async () => {
@@ -130,9 +149,23 @@ export default function StoresPage() {
       const newSharedNames = await getMySharedNames(user.id);
       setSharedNames(newSharedNames);
       setShareSelectedIds(new Set());
-      setShareMode(false);
     } catch (e) {
       alert(`シェアに失敗しました: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+      setSharing(false);
+    }
+  };
+
+  const handleUnshare = async () => {
+    if (!user || unshareSelectedNames.size === 0) return;
+    setSharing(true);
+    try {
+      await removeMultipleFromPublicStores(user.id, Array.from(unshareSelectedNames));
+      const newSharedNames = await getMySharedNames(user.id);
+      setSharedNames(newSharedNames);
+      setUnshareSelectedNames(new Set());
+    } catch (e) {
+      alert(`シェアの取り消しに失敗しました: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
       setSharing(false);
     }
@@ -199,25 +232,38 @@ export default function StoresPage() {
             </div>
           ) : shareMode ? (
             /* シェアモード ヘッダー */
-            <div className="flex items-center justify-between gap-2 mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-700">
-                  {shareSelectedIds.size}件選択中
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleShare}
-                  disabled={shareSelectedIds.size === 0 || sharing}
-                  className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 disabled:opacity-40 transition"
-                >
-                  シェアする（{shareSelectedIds.size}件）
-                </button>
+            <div className="space-y-2 mb-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-gray-700">シェアモード</span>
+                  <button
+                    onClick={handleSelectAllUnshared}
+                    className="text-xs text-blue-600 hover:underline"
+                  >
+                    未シェアを全て選択
+                  </button>
+                </div>
                 <button
                   onClick={handleCancelShareMode}
                   className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition"
                 >
                   キャンセル
+                </button>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleShare}
+                  disabled={shareSelectedIds.size === 0 || sharing}
+                  className="flex-1 text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 disabled:opacity-40 transition"
+                >
+                  シェアする（{shareSelectedIds.size}件）
+                </button>
+                <button
+                  onClick={handleUnshare}
+                  disabled={unshareSelectedNames.size === 0 || sharing}
+                  className="flex-1 text-xs bg-orange-500 text-white px-3 py-1.5 rounded-lg hover:bg-orange-600 disabled:opacity-40 transition"
+                >
+                  シェアを取り消す（{unshareSelectedNames.size}件）
                 </button>
               </div>
             </div>
@@ -285,6 +331,8 @@ export default function StoresPage() {
               onToggleSelect={selecting ? handleToggleSelect : handleToggleShareSelect}
               shareMode={shareMode}
               sharedNames={sharedNames}
+              unshareSelectedNames={unshareSelectedNames}
+              onToggleUnshareSelect={handleToggleUnshareSelect}
             />
           )}
         </div>

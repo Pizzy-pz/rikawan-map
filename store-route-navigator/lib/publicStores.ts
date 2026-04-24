@@ -59,6 +59,22 @@ export async function getMySharedNames(userId: string): Promise<Set<string>> {
   return new Set((data ?? []).map((r: { name: string }) => r.name.toLowerCase()));
 }
 
+export async function removeFromPublicStores(userId: string, name: string): Promise<void> {
+  const { error } = await supabase
+    .from("public_stores")
+    .delete()
+    .eq("shared_by", userId)
+    .ilike("name", name);
+  if (error) throw new Error(error.message);
+}
+
+export async function removeMultipleFromPublicStores(userId: string, names: string[]): Promise<void> {
+  if (names.length === 0) return;
+  for (const name of names) {
+    await removeFromPublicStores(userId, name);
+  }
+}
+
 export async function getNewPublicStores(userId: string): Promise<PublicStore[]> {
   const [{ data: publicData }, myStores] = await Promise.all([
     supabase.from("public_stores").select("*").order("created_at", { ascending: false }),

@@ -93,6 +93,20 @@ export default function DiscoverPage() {
                 </svg>
               </Link>
               <h2 className="text-xl font-bold text-gray-800">新規店舗リスト</h2>
+              {stores.length > 0 && (
+                <button
+                  onClick={() =>
+                    setSelectedIds(
+                      selectedIds.size === stores.length
+                        ? new Set()
+                        : new Set(stores.map((s) => s.id))
+                    )
+                  }
+                  className="text-xs text-blue-600 hover:underline"
+                >
+                  {selectedIds.size === stores.length ? "全て解除" : "全て選択"}
+                </button>
+              )}
             </div>
             {selectedIds.size > 0 && (
               <button
@@ -100,7 +114,7 @@ export default function DiscoverPage() {
                 disabled={adding}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 transition"
               >
-                選択した店舗を追加（{selectedIds.size}件）
+                追加（{selectedIds.size}件）
               </button>
             )}
           </div>
