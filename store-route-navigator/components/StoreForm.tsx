@@ -117,7 +117,7 @@ export default function StoreForm({ initialData, onSubmit, submitLabel, loading,
             <label className="text-sm font-medium text-gray-700">
               座標 <span className="text-red-500">*</span>
             </label>
-            <span className="text-xs text-gray-500">Google マップで場所を長押しするとコピーできます</span>
+            <span className="text-xs text-gray-500">Googleマップで座標を取得できます</span>
           </div>
           <Link
             href="/how-to-get-coordinates"
