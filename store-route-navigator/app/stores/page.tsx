@@ -202,68 +202,61 @@ export default function StoresPage() {
 
           {selecting ? (
             /* 削除モード ヘッダー */
-            <div className="flex items-center justify-between gap-2 mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-700">
-                  {selectedIds.size}件選択中
-                </span>
+            <div className="space-y-3 mb-3">
+              <div className="flex items-center gap-3">
+                <button onClick={handleCancelSelect} className="text-gray-500 hover:text-gray-700 flex-shrink-0">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <span className="text-lg font-bold text-gray-800">選択削除</span>
+                <span className="text-sm text-gray-400">{selectedIds.size}件選択中</span>
                 <button
                   onClick={handleSelectAll}
-                  className="text-xs text-blue-600 hover:underline"
+                  className="ml-auto text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-lg hover:bg-blue-100 transition"
                 >
                   {selectedIds.size === filtered.length ? "全て解除" : "全て選択"}
                 </button>
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setShowBulkDeleteConfirm(true)}
-                  disabled={selectedIds.size === 0 || deleting}
-                  className="text-xs bg-red-500 text-white px-3 py-1.5 rounded-lg hover:bg-red-600 disabled:opacity-40 transition"
-                >
-                  {deleting ? "削除中..." : `削除（${selectedIds.size}件）`}
-                </button>
-                <button
-                  onClick={handleCancelSelect}
-                  className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition"
-                >
-                  キャンセル
-                </button>
-              </div>
+              <button
+                onClick={() => setShowBulkDeleteConfirm(true)}
+                disabled={selectedIds.size === 0 || deleting}
+                className="w-full bg-red-500 text-white py-3 rounded-lg text-sm font-semibold hover:bg-red-600 disabled:opacity-40 transition"
+              >
+                {deleting ? "削除中..." : `削除（${selectedIds.size}件）`}
+              </button>
             </div>
           ) : shareMode ? (
             /* シェアモード ヘッダー */
-            <div className="space-y-2 mb-3">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-gray-700">シェアモード</span>
-                  <button
-                    onClick={handleSelectAllUnshared}
-                    className="text-xs text-blue-600 hover:underline"
-                  >
-                    未シェアを全て選択
-                  </button>
-                </div>
-                <button
-                  onClick={handleCancelShareMode}
-                  className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition"
-                >
-                  キャンセル
+            <div className="space-y-3 mb-3">
+              <div className="flex items-center gap-3">
+                <button onClick={handleCancelShareMode} className="text-gray-500 hover:text-gray-700 flex-shrink-0">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
                 </button>
+                <span className="text-lg font-bold text-gray-800">シェアモード</span>
               </div>
+              <button
+                onClick={handleSelectAllUnshared}
+                className="w-full border-2 border-blue-400 text-blue-600 bg-blue-50 py-2 rounded-lg text-sm font-semibold hover:bg-blue-100 transition"
+              >
+                未シェアを全て選択
+              </button>
               <div className="flex gap-2">
                 <button
                   onClick={handleShare}
                   disabled={shareSelectedIds.size === 0 || sharing}
-                  className="flex-1 text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 disabled:opacity-40 transition"
+                  className="flex-1 bg-blue-600 text-white py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 disabled:opacity-40 transition"
                 >
                   シェアする（{shareSelectedIds.size}件）
                 </button>
                 <button
                   onClick={handleUnshare}
                   disabled={unshareSelectedNames.size === 0 || sharing}
-                  className="flex-1 text-xs bg-orange-500 text-white px-3 py-1.5 rounded-lg hover:bg-orange-600 disabled:opacity-40 transition"
+                  className="flex-1 bg-orange-500 text-white py-3 rounded-lg text-sm font-semibold hover:bg-orange-600 disabled:opacity-40 transition"
                 >
-                  シェアを取り消す（{unshareSelectedNames.size}件）
+                  取り消す（{unshareSelectedNames.size}件）
                 </button>
               </div>
             </div>
@@ -275,14 +268,17 @@ export default function StoresPage() {
                 <div className="flex items-center gap-2">
                   <Link
                     href="/stores/new"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition"
                   >
                     ＋ 新規登録
                   </Link>
                   <button
                     onClick={() => setSelecting(true)}
-                    className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-600 transition"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition"
                   >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
                     選択削除
                   </button>
                 </div>
@@ -291,8 +287,11 @@ export default function StoresPage() {
               <div className="flex items-center justify-between mb-3">
                 <Link
                   href="/stores/discover"
-                  className="text-sm font-medium text-blue-600 hover:underline"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition"
                 >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
                   新規店舗を見る
                 </Link>
                 <button
