@@ -103,7 +103,7 @@ export default function EditStorePage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           {/* initialData で現在の値をフォームに初期セット（座標も含む） */}
           <StoreForm
-            initialData={{ name: store.name, address: store.address, memo: store.memo, latitude: store.latitude, longitude: store.longitude }}
+            initialData={{ name: store.name, memo: store.memo, latitude: store.latitude, longitude: store.longitude }}
             onSubmit={handleSubmit}
             submitLabel="更新する"
             loading={saving}

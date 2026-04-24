@@ -91,7 +91,6 @@ export default function SharedPage() {
     setCopying(store.id);
     await createStore(user.id, {
       name: store.name,
-      address: store.address,
       latitude: store.latitude,
       longitude: store.longitude,
       memo: store.memo ?? undefined,
@@ -108,7 +107,6 @@ export default function SharedPage() {
       if (!copied.has(store.id)) {
         await createStore(user.id, {
           name: store.name,
-          address: store.address,
           latitude: store.latitude,
           longitude: store.longitude,
           memo: store.memo ?? undefined,

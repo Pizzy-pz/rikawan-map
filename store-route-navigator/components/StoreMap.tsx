@@ -18,7 +18,7 @@ type Props = {
   latitude: number | null | undefined;
   longitude: number | null | undefined;
   storeName: string;
-  address: string;
+  address?: string;
 };
 
 /**
