@@ -263,45 +263,44 @@ export default function StoresPage() {
           ) : (
             /* 通常モード ヘッダー */
             <>
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xl font-bold text-gray-800">店舗一覧</h2>
-                <div className="flex items-center gap-2">
-                  <Link
-                    href="/stores/new"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition"
-                  >
-                    ＋ 新規登録
-                  </Link>
-                  <button
-                    onClick={() => setSelecting(true)}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    選択削除
-                  </button>
-                </div>
-              </div>
+              <h2 className="text-xl font-bold text-gray-800 mb-2">店舗一覧</h2>
 
-              <div className="flex items-center justify-between mb-3">
+              {/* 新規登録: 全幅 */}
+              <Link
+                href="/stores/new"
+                className="w-full block text-center bg-blue-600 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 transition mb-2"
+              >
+                ＋ 新規登録
+              </Link>
+
+              {/* サブ操作: 3等分 */}
+              <div className="flex gap-2 mb-3">
                 <Link
                   href="/stores/discover"
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition"
+                  className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg text-sm font-medium border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
-                  新規店舗を見る
+                  新規店舗
                 </Link>
                 <button
                   onClick={() => setShareMode(true)}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition"
+                  className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg text-sm font-medium border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                   </svg>
                   シェア
+                </button>
+                <button
+                  onClick={() => setSelecting(true)}
+                  className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg text-sm font-medium border border-red-200 bg-white text-red-500 hover:bg-red-50 transition"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  選択削除
                 </button>
               </div>
             </>
