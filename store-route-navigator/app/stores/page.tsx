@@ -29,14 +29,6 @@ export default function StoresPage() {
   const [shareLoading, setShareLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const [showImport, setShowImport] = useState(false);
-  const [importUrl, setImportUrl] = useState("");
-  const [importError, setImportError] = useState<string | null>(null);
-
-  const [sortByKana, setSortByKana] = useState(() =>
-    typeof window !== "undefined" ? sessionStorage.getItem("stores_sort") === "kana" : false
-  );
-
   // 選択・一括削除
   const [selecting, setSelecting] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -101,16 +93,6 @@ export default function StoresPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleImportGo = () => {
-    setImportError(null);
-    const match = importUrl.trim().match(/\/shared\/([a-f0-9-]+)/i);
-    if (!match) {
-      setImportError("有効なシェアリンクを貼り付けてください");
-      return;
-    }
-    router.push(`/stores/import?token=${match[1]}`);
-  };
-
   const handleToggleSelect = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -160,8 +142,7 @@ export default function StoresPage() {
   if (!user) return null;
 
   const filtered = stores
-    .filter((s) => s.name.toLowerCase().includes(query.toLowerCase()))
-    .sort((a, b) => sortByKana ? a.name.localeCompare(b.name, "ja") : 0);
+    .filter((s) => s.name.toLowerCase().includes(query.toLowerCase()));
 
   const shareUrl = shareToken
     ? `${typeof window !== "undefined" ? window.location.origin : ""}/shared/${shareToken}`
@@ -214,69 +195,44 @@ export default function StoresPage() {
           ) : (
             /* 通常モード ヘッダー */
             <>
+              {/* Row 1: 店舗一覧 / 新規登録 / 削除 */}
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-xl font-bold text-gray-800">店舗一覧</h2>
-                <Link
-                  href="/stores/new"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition"
-                >
-                  + 新規登録
-                </Link>
+                <div className="flex items-center gap-6">
+                  <Link
+                    href="/stores/new"
+                    className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 transition"
+                  >
+                    ＋ 新規登録
+                  </Link>
+                  <button
+                    onClick={() => { setSelecting(true); setShowShare(false); }}
+                    className="bg-red-500 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-red-600 transition"
+                  >
+                    選択削除
+                  </button>
+                </div>
               </div>
-              <div className="flex gap-1.5 mb-2">
+
+              {/* Row 2: 追加店舗一覧(空) / シェア */}
+              <div className="flex items-center justify-between mb-3">
                 <button
-                  onClick={() => { setShowImport((v) => !v); setShowShare(false); setImportError(null); }}
-                  className={`flex-1 flex items-center justify-center gap-1 text-xs py-2 rounded-lg border transition ${showImport ? "bg-green-600 text-white border-green-600" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"}`}
+                  disabled
+                  className="text-sm font-medium text-gray-300 cursor-not-allowed"
                 >
-                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                  </svg>
-                  <span>リンクから追加</span>
+                  追加店舗一覧
                 </button>
                 <button
-                  onClick={() => { setShowShare((v) => !v); setShowImport(false); }}
-                  className={`flex-1 flex items-center justify-center gap-1 text-xs py-2 rounded-lg border transition ${showShare ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"}`}
+                  onClick={() => setShowShare((v) => !v)}
+                  className={`flex items-center gap-1.5 px-9 py-2 rounded-lg text-sm font-medium border transition ${showShare ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"}`}
                 >
-                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                   </svg>
-                  <span>シェア</span>
-                </button>
-                <button
-                  onClick={() => { setSelecting(true); setShowImport(false); setShowShare(false); }}
-                  className="flex-1 flex items-center justify-center gap-1 text-xs py-2 rounded-lg border bg-white text-gray-600 border-gray-300 hover:bg-gray-50 transition"
-                >
-                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                  </svg>
-                  <span>選択削除</span>
+                  シェア
                 </button>
               </div>
             </>
-          )}
-
-          {showImport && !selecting && (
-            <div className="mb-2 bg-green-50 border border-green-100 rounded-xl p-3 space-y-2">
-              <p className="text-xs font-semibold text-green-800">リンクからリストを追加</p>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={importUrl}
-                  onChange={(e) => { setImportUrl(e.target.value); setImportError(null); }}
-                  onKeyDown={(e) => e.key === "Enter" && handleImportGo()}
-                  placeholder="シェアリンクを貼り付け"
-                  className="flex-1 text-xs bg-white border border-green-200 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-400"
-                />
-                <button
-                  onClick={handleImportGo}
-                  disabled={!importUrl.trim()}
-                  className="text-xs bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 transition whitespace-nowrap"
-                >
-                  確認
-                </button>
-              </div>
-              {importError && <p className="text-xs text-red-600">{importError}</p>}
-            </div>
           )}
 
           {showShare && !selecting && (
@@ -319,20 +275,6 @@ export default function StoresPage() {
           )}
 
           <StoreSearch value={query} onChange={handleQueryChange} />
-          {!selecting && (
-            <div className="flex justify-end mt-1.5">
-              <button
-                onClick={() => setSortByKana((v) => {
-                  const next = !v;
-                  sessionStorage.setItem("stores_sort", next ? "kana" : "default");
-                  return next;
-                })}
-                className={`text-xs px-3 py-1 rounded-full border transition ${sortByKana ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-500 border-gray-300 hover:bg-gray-50"}`}
-              >
-                50音順
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
