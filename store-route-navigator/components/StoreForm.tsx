@@ -113,12 +113,9 @@ export default function StoreForm({ initialData, onSubmit, submitLabel, loading,
       {/* 座標入力フィールド */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <div className="flex items-baseline gap-2">
-            <label className="text-sm font-medium text-gray-700">
-              座標 <span className="text-red-500">*</span>
-            </label>
-            <span className="text-xs text-gray-500">Googleマップで座標を取得できます</span>
-          </div>
+          <label className="text-sm font-medium text-gray-700">
+            座標 <span className="text-red-500">*</span>
+          </label>
           <Link
             href="/how-to-get-coordinates"
             target="_blank"
