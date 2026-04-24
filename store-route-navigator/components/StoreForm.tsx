@@ -32,11 +32,21 @@ export default function StoreForm({ initialData, onSubmit, submitLabel, loading,
   );
   const [memo, setMemo] = useState(initialData?.memo ?? "");
   const [error, setError] = useState<string | null>(null);
+  const [coordError, setCoordError] = useState<string | null>(null);
 
   const isDuplicate =
     existingNames != null &&
     name.trim().length > 0 &&
     existingNames.some((n) => n.toLowerCase() === name.trim().toLowerCase());
+
+  const handleCoordChange = (value: string) => {
+    setCoordInput(value);
+    if (value.trim() && !parseCoords(value)) {
+      setCoordError("無効な座標です（緯度: -90〜90、経度: -180〜180）");
+    } else {
+      setCoordError(null);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +64,7 @@ export default function StoreForm({ initialData, onSubmit, submitLabel, loading,
 
     const parsed = parseCoords(coordInput);
     if (!parsed) {
-      setError("座標の形式が正しくありません（緯度: -90〜90、経度: -180〜180）");
+      setCoordError("無効な座標です（緯度: -90〜90、経度: -180〜180）");
       return;
     }
 
@@ -67,7 +77,7 @@ export default function StoreForm({ initialData, onSubmit, submitLabel, loading,
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
         <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded">
           {error}
@@ -76,14 +86,17 @@ export default function StoreForm({ initialData, onSubmit, submitLabel, loading,
 
       {/* 店名フィールド */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          店名 <span className="text-red-500">*</span>
-        </label>
+        <div className="flex items-baseline gap-2 mb-1">
+          <label className="text-sm font-medium text-gray-700">
+            店名 <span className="text-red-500">*</span>
+          </label>
+          <span className="text-xs text-gray-500">店名はカタカナで入力してください</span>
+        </div>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="例：酒場あおば"
+          placeholder="例：サカバアオバ"
           maxLength={100}
           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
@@ -100,9 +113,12 @@ export default function StoreForm({ initialData, onSubmit, submitLabel, loading,
       {/* 座標入力フィールド */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <label className="text-sm font-medium text-gray-700">
-            座標 <span className="text-red-500">*</span>
-          </label>
+          <div className="flex items-baseline gap-2">
+            <label className="text-sm font-medium text-gray-700">
+              座標 <span className="text-red-500">*</span>
+            </label>
+            <span className="text-xs text-gray-500">Google マップで場所を長押しするとコピーできます</span>
+          </div>
           <Link
             href="/how-to-get-coordinates"
             target="_blank"
@@ -117,22 +133,24 @@ export default function StoreForm({ initialData, onSubmit, submitLabel, loading,
         <input
           type="text"
           value={coordInput}
-          onChange={(e) => setCoordInput(e.target.value)}
+          onChange={(e) => handleCoordChange(e.target.value)}
           placeholder="例：35.0053, 135.7731"
           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <p className="mt-1 text-xs text-gray-400">Google マップで場所を長押しするとコピーできます</p>
+        {coordError && (
+          <p className="mt-1 text-sm text-red-600">{coordError}</p>
+        )}
       </div>
 
       {/* メモフィールド */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          メモ <span className="text-gray-400 text-xs">（任意）</span>
+          メモ
         </label>
         <textarea
           value={memo}
           onChange={(e) => setMemo(e.target.value)}
-          placeholder="場所情報、担当者名など"
+          placeholder="場所情報、備考など"
           rows={3}
           maxLength={500}
           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
