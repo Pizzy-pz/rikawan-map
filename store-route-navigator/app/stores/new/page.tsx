@@ -1,10 +1,3 @@
-/**
- * 店舗新規登録ページ（/stores/new）
- *
- * StoreForm コンポーネントを使って新しい店舗を登録する。
- * - マウント時に既存の店名一覧を取得し、重複警告に使用する
- * - フォーム送信後は登録した店舗の詳細ページへリダイレクト
- */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -12,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/authContext";
 import { createStore, getStores } from "@/lib/stores";
+import { isInPublicStores, uploadToPublicStores } from "@/lib/publicStores";
 import Header from "@/components/Header";
 import StoreForm from "@/components/StoreForm";
 import { StoreFormData } from "@/types/store";
@@ -22,14 +16,17 @@ export default function NewStorePage() {
   const [saving, setSaving] = useState(false);
   const [existingNames, setExistingNames] = useState<string[]>([]);
 
-  // 未ログインならログインページへリダイレクト
+  const [pendingStoreId, setPendingStoreId] = useState<string | null>(null);
+  const [pendingData, setPendingData] = useState<(StoreFormData & { latitude: number; longitude: number }) | null>(null);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
     }
   }, [user, loading, router]);
 
-  // 既存の店名一覧を取得（重複警告のため）
   useEffect(() => {
     if (user) {
       getStores(user.id).then((stores) => setExistingNames(stores.map((s) => s.name)));
@@ -46,14 +43,32 @@ export default function NewStorePage() {
 
   if (!user) return null;
 
-  /** フォーム送信時: DB に保存 → 詳細ページへ遷移 */
   const handleSubmit = async (data: StoreFormData & { latitude: number; longitude: number }) => {
     setSaving(true);
     const store = await createStore(user.id, data);
     setSaving(false);
-    if (store) {
+    if (!store) return;
+
+    const alreadyPublic = await isInPublicStores(data.name);
+    if (alreadyPublic) {
       router.push(`/stores/${store.id}`);
+    } else {
+      setPendingStoreId(store.id);
+      setPendingData(data);
+      setShowUploadModal(true);
     }
+  };
+
+  const handleUpload = async () => {
+    if (!user || !pendingData || !pendingStoreId) return;
+    setUploading(true);
+    await uploadToPublicStores(user.id, pendingData);
+    setUploading(false);
+    router.push(`/stores/${pendingStoreId}`);
+  };
+
+  const handleSkipUpload = () => {
+    if (pendingStoreId) router.push(`/stores/${pendingStoreId}`);
   };
 
   return (
@@ -73,6 +88,33 @@ export default function NewStorePage() {
           <StoreForm onSubmit={handleSubmit} submitLabel="登録する" loading={saving} existingNames={existingNames} />
         </div>
       </main>
+
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 mx-4 max-w-sm w-full shadow-lg">
+            <h3 className="text-gray-800 font-semibold mb-2">この店舗を共有しますか？</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              公開リストに追加すると、他のユーザーも新規店舗として発見できるようになります。
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={handleSkipUpload}
+                disabled={uploading}
+                className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition text-sm"
+              >
+                しない
+              </button>
+              <button
+                onClick={handleUpload}
+                disabled={uploading}
+                className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition text-sm disabled:opacity-50"
+              >
+                {uploading ? "共有中..." : "シェアする"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

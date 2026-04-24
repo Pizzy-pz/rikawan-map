@@ -1,16 +1,3 @@
-/**
- * 店舗一覧コンポーネント
- *
- * 店舗リストを表示する。2つのモードがある:
- *
- * 通常モード（selectable = false）:
- *   - 各店舗は詳細ページへのリンク
- *
- * 選択削除モード（selectable = true）:
- *   - 各店舗はチェックボックス付きのボタン
- *   - 選択された店舗は赤くハイライト
- *   - onToggleSelect で親に選択状態を通知
- */
 "use client";
 
 import Link from "next/link";
@@ -18,13 +5,21 @@ import { Store } from "@/types/store";
 
 type Props = {
   stores: Store[];
-  selectable?: boolean;                      // 選択削除モードかどうか
-  selectedIds?: Set<string>;                 // 選択中の店舗IDセット
-  onToggleSelect?: (id: string) => void;     // 選択/解除のコールバック
+  selectable?: boolean;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
+  shareMode?: boolean;
+  sharedNames?: Set<string>;
 };
 
-export default function StoreList({ stores, selectable, selectedIds, onToggleSelect }: Props) {
-  // 店舗がない場合は空状態メッセージを表示
+export default function StoreList({
+  stores,
+  selectable,
+  selectedIds,
+  onToggleSelect,
+  shareMode,
+  sharedNames,
+}: Props) {
   if (stores.length === 0) {
     return (
       <div className="text-center py-16 text-gray-500">
@@ -41,8 +36,9 @@ export default function StoreList({ stores, selectable, selectedIds, onToggleSel
     <ul className="space-y-3">
       {stores.map((store) => {
         const isSelected = selectedIds?.has(store.id) ?? false;
+        const isShared = sharedNames?.has(store.name.toLowerCase()) ?? false;
 
-        // --- 選択削除モード ---
+        // --- 選択削除モード（赤） ---
         if (selectable) {
           return (
             <li key={store.id}>
@@ -50,11 +46,10 @@ export default function StoreList({ stores, selectable, selectedIds, onToggleSel
                 onClick={() => onToggleSelect?.(store.id)}
                 className={`w-full text-left border rounded-lg p-4 transition flex items-center gap-3 ${
                   isSelected
-                    ? "bg-red-50 border-red-300"   // 選択中: 赤いハイライト
+                    ? "bg-red-50 border-red-300"
                     : "bg-white border-gray-200 hover:border-gray-300"
                 }`}
               >
-                {/* チェックボックス（円形） */}
                 <span className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                   isSelected ? "border-red-500 bg-red-500" : "border-gray-300"
                 }`}>
@@ -75,7 +70,53 @@ export default function StoreList({ stores, selectable, selectedIds, onToggleSel
           );
         }
 
-        // --- 通常モード（詳細ページへのリンク） ---
+        // --- シェアモード（青） ---
+        if (shareMode) {
+          return (
+            <li key={store.id}>
+              <button
+                onClick={() => !isShared && onToggleSelect?.(store.id)}
+                disabled={isShared}
+                className={`w-full text-left border rounded-lg p-4 transition flex items-center gap-3 ${
+                  isShared
+                    ? "bg-gray-50 border-gray-200 cursor-default opacity-60"
+                    : isSelected
+                    ? "bg-blue-50 border-blue-300"
+                    : "bg-white border-gray-200 hover:border-blue-300"
+                }`}
+              >
+                <span className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                  isShared
+                    ? "border-gray-300 bg-gray-300"
+                    : isSelected
+                    ? "border-blue-500 bg-blue-500"
+                    : "border-gray-300"
+                }`}>
+                  {(isSelected || isShared) && (
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-gray-900 truncate">{store.name}</h3>
+                    {isShared && (
+                      <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full whitespace-nowrap">
+                        シェア済み
+                      </span>
+                    )}
+                  </div>
+                  {store.memo && (
+                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">{store.memo}</p>
+                  )}
+                </div>
+              </button>
+            </li>
+          );
+        }
+
+        // --- 通常モード ---
         return (
           <li key={store.id}>
             <Link
@@ -85,12 +126,10 @@ export default function StoreList({ stores, selectable, selectedIds, onToggleSel
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-gray-900 truncate">{store.name}</h3>
-                  {/* メモがある場合のみ表示（最大2行） */}
                   {store.memo && (
                     <p className="text-sm text-gray-500 mt-1 line-clamp-2">{store.memo}</p>
                   )}
                 </div>
-                {/* 右矢印アイコン */}
                 <svg className="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
