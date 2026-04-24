@@ -123,7 +123,6 @@ export default function StoreDetailPage() {
             />
           </div>
 
-          <p className="text-xs text-gray-300 text-right">{store.address}</p>
         </div>
       </main>
 

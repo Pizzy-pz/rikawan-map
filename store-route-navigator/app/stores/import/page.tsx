@@ -68,7 +68,6 @@ function ImportContent() {
     setCopyingOne(store.id);
     await createStore(user.id, {
       name: store.name,
-      address: store.address,
       latitude: store.latitude,
       longitude: store.longitude,
       memo: store.memo ?? undefined,
@@ -86,7 +85,6 @@ function ImportContent() {
     for (let i = 0; i < targets.length; i++) {
       await createStore(user.id, {
         name: targets[i].name,
-        address: targets[i].address,
         latitude: targets[i].latitude,
         longitude: targets[i].longitude,
         memo: targets[i].memo ?? undefined,
