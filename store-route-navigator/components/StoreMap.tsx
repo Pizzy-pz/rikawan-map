@@ -87,12 +87,25 @@ export default function StoreMap({ latitude, longitude, storeName, address }: Pr
 
   return (
     <div className="space-y-3">
+      {/* Google マップアプリへのリンクボタン */}
+      <a
+        href={googleMapsNavUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="w-full bg-green-600 text-white py-4 rounded-xl font-semibold text-base hover:bg-green-700 active:bg-green-800 transition flex items-center justify-center gap-3 shadow-sm"
+      >
+        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+        </svg>
+        {hasCoords ? "Google マップでルートを確認" : "Google マップで検索"}
+      </a>
+
       {hasCoords ? (
         // --- 座標あり: Google マップを表示 ---
         <div className="relative">
           <div
             ref={mapRef}
-            className="w-full h-96 rounded-xl border border-gray-200 bg-gray-100"
+            className="w-full h-[400px] rounded-xl border border-gray-200 bg-gray-100"
           />
           {/* マップ読み込み中のオーバーレイ */}
           {!mapReady && !initError && (
@@ -114,19 +127,6 @@ export default function StoreMap({ latitude, longitude, storeName, address }: Pr
           <span className="text-gray-300 text-xs">編集画面から座標を入力してください</span>
         </div>
       )}
-
-      {/* Google マップアプリへのリンクボタン */}
-      <a
-        href={googleMapsNavUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="w-full bg-green-600 text-white py-4 rounded-xl font-semibold text-base hover:bg-green-700 active:bg-green-800 transition flex items-center justify-center gap-3 shadow-sm"
-      >
-        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-        </svg>
-        {hasCoords ? "Google マップでルートを確認" : "Google マップで検索"}
-      </a>
     </div>
   );
 }

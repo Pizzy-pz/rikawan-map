@@ -81,33 +81,31 @@ export default function StoreDetailPage() {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 py-6">
-        <div className="flex items-center gap-2 mb-6">
-          <Link href="/stores" className="text-gray-500 hover:text-gray-700">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex items-center justify-between mb-4">
+          <Link href="/stores" className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-700">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
+            <span className="text-sm font-medium">戻る</span>
           </Link>
-          <h2 className="text-xl font-bold text-gray-800 truncate">{store.name}</h2>
+          <div className="flex gap-2">
+            <Link
+              href={`/stores/${store.id}/edit`}
+              className="text-base bg-gray-100 text-gray-700 px-5 py-2 rounded-lg hover:bg-gray-200 transition"
+            >
+              編集
+            </Link>
+            <button
+              onClick={openDeleteConfirm}
+              className="text-base bg-red-50 text-red-600 px-5 py-2 rounded-lg hover:bg-red-100 transition"
+            >
+              削除
+            </button>
+          </div>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-5">
-          <div className="flex items-start justify-between gap-4">
-            <h3 className="text-2xl font-bold text-gray-900">{store.name}</h3>
-            <div className="flex gap-2 flex-shrink-0">
-              <Link
-                href={`/stores/${store.id}/edit`}
-                className="text-sm bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition"
-              >
-                編集
-              </Link>
-              <button
-                onClick={openDeleteConfirm}
-                className="text-sm bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 transition"
-              >
-                削除
-              </button>
-            </div>
-          </div>
+          <h3 className="text-2xl font-bold text-gray-900">{store.name}</h3>
 
           {store.memo && (
             <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
