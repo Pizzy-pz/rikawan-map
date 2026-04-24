@@ -124,13 +124,18 @@ export default function StoresPage() {
   const handleShare = async () => {
     if (!user || shareSelectedIds.size === 0) return;
     setSharing(true);
-    const targets = stores.filter((s) => shareSelectedIds.has(s.id));
-    await uploadMultipleToPublicStores(user.id, targets);
-    const newSharedNames = await getMySharedNames(user.id);
-    setSharedNames(newSharedNames);
-    setShareSelectedIds(new Set());
-    setShareMode(false);
-    setSharing(false);
+    try {
+      const targets = stores.filter((s) => shareSelectedIds.has(s.id));
+      await uploadMultipleToPublicStores(user.id, targets);
+      const newSharedNames = await getMySharedNames(user.id);
+      setSharedNames(newSharedNames);
+      setShareSelectedIds(new Set());
+      setShareMode(false);
+    } catch (e) {
+      alert(`シェアに失敗しました: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+      setSharing(false);
+    }
   };
 
   if (loading) {

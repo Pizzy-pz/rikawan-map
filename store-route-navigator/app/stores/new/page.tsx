@@ -62,8 +62,13 @@ export default function NewStorePage() {
   const handleUpload = async () => {
     if (!user || !pendingData || !pendingStoreId) return;
     setUploading(true);
-    await uploadToPublicStores(user.id, pendingData);
-    setUploading(false);
+    try {
+      await uploadToPublicStores(user.id, pendingData);
+    } catch (e) {
+      alert(`シェアに失敗しました: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+      setUploading(false);
+    }
     router.push(`/stores/${pendingStoreId}`);
   };
 

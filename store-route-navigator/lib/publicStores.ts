@@ -25,13 +25,14 @@ export async function uploadToPublicStores(
   userId: string,
   data: StoreFormData & { latitude: number; longitude: number }
 ): Promise<void> {
-  await supabase.from("public_stores").insert({
+  const { error } = await supabase.from("public_stores").insert({
     name: data.name,
     latitude: data.latitude,
     longitude: data.longitude,
     memo: data.memo ?? null,
     shared_by: userId,
   });
+  if (error) throw new Error(error.message);
 }
 
 export async function uploadMultipleToPublicStores(
@@ -46,7 +47,8 @@ export async function uploadMultipleToPublicStores(
     memo: s.memo ?? null,
     shared_by: userId,
   }));
-  await supabase.from("public_stores").insert(rows);
+  const { error } = await supabase.from("public_stores").insert(rows);
+  if (error) throw new Error(error.message);
 }
 
 export async function getMySharedNames(userId: string): Promise<Set<string>> {
