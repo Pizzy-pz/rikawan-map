@@ -1,11 +1,31 @@
 # API設計書
 
-すべてのエンドポイントは以下の共通セキュリティを通過する。
+## 共通セキュリティフロー
 
-| セキュリティ | 内容 |
-|---|---|
-| 認証 | `Authorization: Bearer <token>` が必要。未認証は 401 |
-| レート制限 | 同一 IP から 1 分間 30 リクエストまで。超過で 429 |
+```mermaid
+sequenceDiagram
+    participant C as クライアント
+    participant P as API Routes（プロキシ層）
+    participant S as Supabase Auth
+    participant G as Google API
+
+    C->>P: GET /api/directions or /api/geocode
+    P->>P: レート制限チェック（同一IP 30req/分）
+    alt 制限超過
+        P-->>C: 429 Too Many Requests
+    end
+    P->>S: Bearer トークン検証
+    alt 未認証 / 無効トークン
+        P-->>C: 401 Unauthorized
+    end
+    P->>P: パラメータバリデーション
+    alt 不正な値
+        P-->>C: 400 Bad Request
+    end
+    P->>G: Google API 呼び出し
+    G-->>P: レスポンス
+    P-->>C: 200 OK
+```
 
 ---
 
@@ -34,11 +54,11 @@
 
 | ステータス | 内容 |
 |---|---|
-| 200 | Google Directions API のレスポンスをそのまま返す |
-| 400 | パラメータ不足、座標範囲外、ルート取得失敗 |
-| 401 | 未認証 |
-| 429 | レート制限超過 |
-| 500 | API キー未設定 |
+| `200` | Google Directions API のレスポンスをそのまま返す |
+| `400` | パラメータ不足 / 座標範囲外 / ルート取得失敗 |
+| `401` | 未認証 |
+| `429` | レート制限超過 |
+| `500` | API キー未設定 |
 
 ---
 
@@ -54,11 +74,11 @@
 
 | ステータス | 内容 |
 |---|---|
-| 200 | `{ "latitude": 35.6, "longitude": 139.7 }` |
-| 400 | パラメータ不足、文字数超過、変換失敗 |
-| 401 | 未認証 |
-| 429 | レート制限超過 |
-| 500 | API キー未設定 |
+| `200` | `{ "latitude": 35.6, "longitude": 139.7 }` |
+| `400` | パラメータ不足 / 文字数超過 / 変換失敗 |
+| `401` | 未認証 |
+| `429` | レート制限超過 |
+| `500` | API キー未設定 |
 
 ---
 
@@ -68,5 +88,5 @@
 
 | ステータス | 内容 |
 |---|---|
-| 200 | `{ "apiKey": "..." }` |
-| 500 | API キー未設定 |
+| `200` | `{ "apiKey": "..." }` |
+| `500` | API キー未設定 |
