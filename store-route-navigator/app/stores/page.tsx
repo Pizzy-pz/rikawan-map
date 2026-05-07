@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/authContext";
 import { getStores, deleteStore } from "@/lib/stores";
@@ -17,7 +16,6 @@ const QUERY_KEY = "stores_query";
 
 export default function StoresPage() {
   const { user, loading } = useAuth();
-  const router = useRouter();
   const [stores, setStores] = useState<Store[]>([]);
   const [query, setQuery] = useState(() =>
     typeof window !== "undefined" ? sessionStorage.getItem(QUERY_KEY) ?? "" : ""
@@ -37,12 +35,6 @@ export default function StoresPage() {
   const [unshareSelectedNames, setUnshareSelectedNames] = useState<Set<string>>(new Set());
   const [sharedNames, setSharedNames] = useState<Set<string>>(new Set());
   const [sharing, setSharing] = useState(false);
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
-    }
-  }, [user, loading, router]);
 
   useEffect(() => {
     if (user) {

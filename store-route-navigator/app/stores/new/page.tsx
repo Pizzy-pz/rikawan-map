@@ -22,12 +22,6 @@ export default function NewStorePage() {
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
-    }
-  }, [user, loading, router]);
-
-  useEffect(() => {
     if (user) {
       getStores(user.id).then((stores) => setExistingNames(stores.map((s) => s.name)));
     }
