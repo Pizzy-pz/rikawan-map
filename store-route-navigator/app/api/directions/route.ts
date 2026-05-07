@@ -36,6 +36,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
   }
 
+  const coords = [
+    { name: "originLat", value: parseFloat(originLat), min: -90, max: 90 },
+    { name: "originLng", value: parseFloat(originLng), min: -180, max: 180 },
+    { name: "destLat", value: parseFloat(destLat), min: -90, max: 90 },
+    { name: "destLng", value: parseFloat(destLng), min: -180, max: 180 },
+  ];
+  for (const { name, value, min, max } of coords) {
+    if (isNaN(value) || value < min || value > max) {
+      return NextResponse.json({ error: `Invalid parameter: ${name}` }, { status: 400 });
+    }
+  }
+
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: "API key not configured" }, { status: 500 });
