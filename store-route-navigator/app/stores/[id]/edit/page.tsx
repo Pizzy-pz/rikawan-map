@@ -28,13 +28,6 @@ export default function EditStorePage() {
   const [saving, setSaving] = useState(false);
   const [existingNames, setExistingNames] = useState<string[]>([]);
 
-  // 未ログインならログインページへリダイレクト
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
-    }
-  }, [user, loading, router]);
-
   useEffect(() => {
     if (user && id) {
       // 対象の店舗データを取得（自分の店舗のみ取得される）

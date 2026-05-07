@@ -20,12 +20,6 @@ export default function StoreDetailPage() {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
-    }
-  }, [user, loading, router]);
-
-  useEffect(() => {
     if (user && id) {
       getStore(id, user.id).then((found) => {
         if (found) {

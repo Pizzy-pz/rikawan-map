@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/authContext";
 import { createStore } from "@/lib/stores";
@@ -11,18 +10,11 @@ import LoadingOverlay from "@/components/LoadingOverlay";
 
 export default function DiscoverPage() {
   const { user, loading } = useAuth();
-  const router = useRouter();
   const [stores, setStores] = useState<PublicStore[]>([]);
   const [fetching, setFetching] = useState(true);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [adding, setAdding] = useState(false);
   const [addProgress, setAddProgress] = useState(0);
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
-    }
-  }, [user, loading, router]);
 
   useEffect(() => {
     if (user) {
