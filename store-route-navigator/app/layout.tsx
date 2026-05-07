@@ -16,6 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Store Route Navigator",
   description: "店舗検索・ルート表示Webアプリ",
+  colorScheme: "light",
 };
 
 export default function RootLayout({
