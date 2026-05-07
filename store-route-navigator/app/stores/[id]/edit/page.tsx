@@ -73,7 +73,7 @@ export default function EditStorePage() {
   if (!store) return null;
 
   /** フォーム送信時: DB を更新 → 詳細ページへ遷移 */
-  const handleSubmit = async (data: StoreFormData & { latitude: number; longitude: number }) => {
+  const handleSubmit = async (data: StoreFormData) => {
     setSaving(true);
     await updateStore(id, user.id, data);
     setSaving(false);

@@ -12,7 +12,7 @@ export type Store = {
 
 export type StoreFormData = {
   name: string;
-  latitude?: number;
-  longitude?: number;
+  latitude: number;
+  longitude: number;
   memo?: string;
 };

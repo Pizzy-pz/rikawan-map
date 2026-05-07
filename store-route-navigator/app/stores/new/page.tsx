@@ -17,7 +17,7 @@ export default function NewStorePage() {
   const [existingNames, setExistingNames] = useState<string[]>([]);
 
   const [pendingStoreId, setPendingStoreId] = useState<string | null>(null);
-  const [pendingData, setPendingData] = useState<(StoreFormData & { latitude: number; longitude: number }) | null>(null);
+  const [pendingData, setPendingData] = useState<StoreFormData | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -37,7 +37,7 @@ export default function NewStorePage() {
 
   if (!user) return null;
 
-  const handleSubmit = async (data: StoreFormData & { latitude: number; longitude: number }) => {
+  const handleSubmit = async (data: StoreFormData) => {
     setSaving(true);
     const store = await createStore(user.id, data);
     setSaving(false);

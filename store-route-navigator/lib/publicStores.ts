@@ -23,7 +23,7 @@ export async function isInPublicStores(name: string): Promise<boolean> {
 
 export async function uploadToPublicStores(
   userId: string,
-  data: StoreFormData & { latitude: number; longitude: number }
+  data: StoreFormData
 ): Promise<void> {
   const { error } = await supabase.from("public_stores").insert({
     name: data.name,
@@ -70,9 +70,13 @@ export async function removeFromPublicStores(userId: string, name: string): Prom
 
 export async function removeMultipleFromPublicStores(userId: string, names: string[]): Promise<void> {
   if (names.length === 0) return;
-  for (const name of names) {
-    await removeFromPublicStores(userId, name);
-  }
+  const orFilter = names.map((n) => `name.ilike.${n}`).join(",");
+  const { error } = await supabase
+    .from("public_stores")
+    .delete()
+    .eq("shared_by", userId)
+    .or(orFilter);
+  if (error) throw new Error(error.message);
 }
 
 export async function getNewPublicStores(userId: string): Promise<PublicStore[]> {

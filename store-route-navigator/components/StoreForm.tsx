@@ -5,8 +5,8 @@ import Link from "next/link";
 import { StoreFormData } from "@/types/store";
 
 type Props = {
-  initialData?: StoreFormData & { latitude?: number; longitude?: number };
-  onSubmit: (data: StoreFormData & { latitude: number; longitude: number }) => void;
+  initialData?: Partial<StoreFormData>;
+  onSubmit: (data: StoreFormData) => void;
   submitLabel: string;
   loading?: boolean;
   existingNames?: string[];
