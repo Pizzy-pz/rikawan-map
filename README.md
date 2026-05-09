@@ -87,34 +87,6 @@ APIキーのブラウザ露出を防ぎつつ、ユーザーが利用できる�
 
 ---
 
-<img width="1240" height="1754" alt="Image" src="https://github.com/user-attachments/assets/77a309a4-95b9-4e12-b585-0b59c823f784" />
-
-<img width="741" height="945" alt="Image" src="https://github.com/user-attachments/assets/78cf8562-d5b3-4019-a709-7438914ee07d" />
-
-<img width="1200" height="831" alt="Image" src="https://github.com/user-attachments/assets/ef5b3310-d86e-4e58-a115-eb77338736f7" />
-
-<img width="1384" height="1123" alt="Image" src="https://github.com/user-attachments/assets/65456363-fc8e-4a80-8630-9ebe992240e9" />
-
-<img width="1764" height="4588" alt="Image" src="https://github.com/user-attachments/assets/bce5a21c-7a4f-4ae0-87f8-0eb0c73c7978" />
-
-<img width="2368" height="3824" alt="Image" src="https://github.com/user-attachments/assets/cb303931-0b3a-4714-bed4-3c16568a5eb5" />
-
-<img width="1502" height="4058" alt="Image" src="https://github.com/user-attachments/assets/833453dc-bafc-4e56-a147-a41c77915813" />
-
----
-
-## 各画面の機能説明です
-
-<img width="2480" height="1024" alt="Image" src="https://github.com/user-attachments/assets/9a5eee94-f618-4f78-a5cb-4b4ef3e61dfb" />
-
-<img width="2480" height="1250" alt="Image" src="https://github.com/user-attachments/assets/0ef93123-e074-40e8-92be-e7776796e537" />
-
-<img width="2480" height="1436" alt="Image" src="https://github.com/user-attachments/assets/0c6964be-2ec6-4628-86d6-39eb891ee953" />
-
-<img width="2480" height="1556" alt="Image" src="https://github.com/user-attachments/assets/85d977f4-0cb3-4116-a5af-5f7daaf6815e" />
-
-<img width="2480" height="1328" alt="Image" src="https://github.com/user-attachments/assets/61835923-6288-4ca0-9101-f29b05b29048" />
-
 <img width="2480" height="982" alt="Image" src="https://github.com/user-attachments/assets/fac7e5dd-0217-4c3f-ad63-53d1f16ef626" />
 
 <img width="2480" height="1540" alt="Image" src="https://github.com/user-attachments/assets/be3766be-1de0-48d6-a3cd-7785434735da" />
