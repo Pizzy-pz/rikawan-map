@@ -86,7 +86,3 @@ GitHubと連携させると、pushするだけで自動デプロイされるた�
 APIキーのブラウザ露出を防ぎつつ、ユーザーが利用できるようにすることです。
 
 ---
-
-<img width="2480" height="982" alt="Image" src="https://github.com/user-attachments/assets/fac7e5dd-0217-4c3f-ad63-53d1f16ef626" />
-
-<img width="2480" height="1540" alt="Image" src="https://github.com/user-attachments/assets/be3766be-1de0-48d6-a3cd-7785434735da" />
