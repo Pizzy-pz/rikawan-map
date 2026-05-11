@@ -11,7 +11,7 @@
 
 [サイトマップ](./設計/サイトマップ.md) / [ER図](./設計/ER図.md) / [API設計書](./設計/API設計書.md) / [インフラ構成図](./設計/インフラ構成図.md) <br>
 [フローチャート(全体図)](./設計/フローチャート_ログインからの全体図.md) / [フローチャート(シェア・インポート)](./設計/フローチャート_シェア・インポート.md) / [フローチャート(登録・編集)](./設計/フローチャート_登録編集.md) <br>
-[画面設計書 1-1 ログイン](./設計/画面設計書/1-1_ログイン.md) / [1-2 新規登録](./設計/画面設計書/1-2_新規登録.md) / [2-1 店舗一覧](./設計/画面設計書/2-1_店舗一覧.md) / [2-2 店舗新規登録（シェア機能）](./設計/画面設計書/2-2_店舗新規登録.md) / [2-3 店舗詳細](./設計/画面設計書/2-3_店舗詳細.md) / [2-4 店舗編集](./設計/画面設計書/2-4_店舗編集.md)
+[画面設計書 1-1 ログイン](./設計/画面設計書/1-1_ログイン.md) / [1-2 新規登録](./設計/画面設計書/1-2_新規登録.md) / [2-1 店舗一覧](./設計/画面設計書/2-1_店舗一覧.md) / [2-1-b シェアモード](./設計/画面設計書/2-1-b_シェアモード.md) / [2-2 店舗新規登録](./設計/画面設計書/2-2_店舗新規登録.md) / [2-3 店舗詳細](./設計/画面設計書/2-3_店舗詳細.md) / [2-4 店舗編集](./設計/画面設計書/2-4_店舗編集.md) / [3-1 新規店舗追加](./設計/画面設計書/3-1_新規店舗追加.md)
 
 ---
 
@@ -124,22 +124,17 @@ Supabase の RLS（行レベルセキュリティ）を DB に設定し、ログ
 
 ---
 
-<img width="1240" height="1754" alt="Image" src="https://github.com/user-attachments/assets/77a309a4-95b9-4e12-b585-0b59c823f784" />
-<img width="741" height="945" alt="Image" src="https://github.com/user-attachments/assets/78cf8562-d5b3-4019-a709-7438914ee07d" />
-<img width="1200" height="831" alt="Image" src="https://github.com/user-attachments/assets/ef5b3310-d86e-4e58-a115-eb77338736f7" />
-<img width="1384" height="1123" alt="Image" src="https://github.com/user-attachments/assets/65456363-fc8e-4a80-8630-9ebe992240e9" />
-<img width="1764" height="4588" alt="Image" src="https://github.com/user-attachments/assets/bce5a21c-7a4f-4ae0-87f8-0eb0c73c7978" />
-<img width="2368" height="3824" alt="Image" src="https://github.com/user-attachments/assets/cb303931-0b3a-4714-bed4-3c16568a5eb5" />
-<img width="1502" height="4058" alt="Image" src="https://github.com/user-attachments/assets/833453dc-bafc-4e56-a147-a41c77915813" />
-
----
-
 ## 各画面の機能説明
 
-<img width="2480" height="1024" alt="Image" src="https://github.com/user-attachments/assets/9a5eee94-f618-4f78-a5cb-4b4ef3e61dfb" />
-<img width="2480" height="1250" alt="Image" src="https://github.com/user-attachments/assets/0ef93123-e074-40e8-92be-e7776796e537" />
-<img width="2480" height="1436" alt="Image" src="https://github.com/user-attachments/assets/0c6964be-2ec6-4628-86d6-39eb891ee953" />
-<img width="2480" height="1556" alt="Image" src="https://github.com/user-attachments/assets/85d977f4-0cb3-4116-a5af-5f7daaf6815e" />
-<img width="2480" height="1328" alt="Image" src="https://github.com/user-attachments/assets/61835923-6288-4ca0-9101-f29b05b29048" />
-<img width="2480" height="982" alt="Image" src="https://github.com/user-attachments/assets/fac7e5dd-0217-4c3f-ad63-53d1f16ef626" />
-<img width="2480" height="1540" alt="Image" src="https://github.com/user-attachments/assets/be3766be-1de0-48d6-a3cd-7785434735da" />
+各画面のワイヤーフレーム・機能詳細は画面設計書を参照してください。
+
+| 画面 | リンク |
+| --- | --- |
+| 1-1 ログイン | [画面設計書](./設計/画面設計書/1-1_ログイン.md) |
+| 1-2 新規登録 | [画面設計書](./設計/画面設計書/1-2_新規登録.md) |
+| 2-1 店舗一覧 | [画面設計書](./設計/画面設計書/2-1_店舗一覧.md) |
+| 2-1-b シェアモード | [画面設計書](./設計/画面設計書/2-1-b_シェアモード.md) |
+| 2-2 店舗新規登録 | [画面設計書](./設計/画面設計書/2-2_店舗新規登録.md) |
+| 2-3 店舗詳細 | [画面設計書](./設計/画面設計書/2-3_店舗詳細.md) |
+| 2-4 店舗編集 | [画面設計書](./設計/画面設計書/2-4_店舗編集.md) |
+| 3-1 新規店舗追加 | [画面設計書](./設計/画面設計書/3-1_新規店舗追加.md) |
